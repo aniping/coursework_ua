@@ -1,0 +1,5 @@
+q4r1 = (sale) product (department)
+q4r2 = select (q4r1) (dname=deptname)
+q4r3 = select (q4r2) (deptfloor="2")
+q4r4 = project (q4r3) (itemno)
+display q4r4

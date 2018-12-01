@@ -1,0 +1,157 @@
+Task: Cracking a Program (Assignment-B-1, easier one)
+Input: linux executable (with debug symbols stripped).
+       It takes one command line argument, but has an expired-time
+       check. Everytime running it will get a segmenatation fault.
+Output: Patch the executable to disable the expired-time check that
+	prevent the program from running.
+
+Hacking log:
+1. Try running it with different arguments to see how it behaves.
+   Segmentation fault was trigger everytime.
+
+2. Run command:
+   objdump -d challenge > challenge.s
+   to disassemble the binary code into x86 assembly code.
+
+3. Play with commands objdump, readelf, ltrace/strace and strings 
+   against the executable to find some clues.
+
+4. At first, I thought the program takes some certain argument as some
+   kind of key. So I spent fair amount of time search this "key" in the
+   executable. Turns out I was in wrong direction. Then I go for expired-time
+   check directly.
+
+5. Run command:
+   strings challenge | grep time
+   output: 
+   1667 gettimeofday
+   165301 gettimeofday@@GLIBC_2.2.5
+
+conclusion:
+    This shows that library function gettimeofday was called.
+The return value maybe used for checking expiration time.
+Need to look at the asm code to see how the return value was used.
+But gettimeofday actually store the value indirectly in a struct, so
+it will be too hard to trace these values.
+
+6. Run command to get into gdb:
+   gdb challenge
+   
+7. Inside gdb shell:
+   break gettimeofday # set a break point at the function call
+   
+   run 23 # run the program with any argument to get to the break point.
+   
+   (gdb) where
+   #0  __gettimeofday () at ../sysdeps/unix/sysv/linux/x86_64/gettimeofday.c:31
+   #1  0x00007ffff7de8855 in elf_ifunc_invoke (addr=<optimized out>) at ../sysdeps/x86_64/dl-irel.h:33
+   #2  _dl_fixup (l=<optimized out>, reloc_arg=<optimized out>) at ../elf/dl-runtime.c:150
+   #3  0x00007ffff7def235 in _dl_runtime_resolve () at ../sysdeps/x86_64/dl-trampoline.S:42
+   #4  0x00000000004010f7 in SECRET ()
+   #5  0x000000000040076e in main ()
+   (stack frames, can use frame 3 to show the stack #3)
+
+   (gdb) c
+   Continuing.
+
+   Breakpoint 1, 0x00007ffff7ffb9f4 in gettimeofday ()
+   (gdb) where
+   #0  0x00007ffff7ffb9f4 in gettimeofday ()
+   #1  0x00000000004010f7 in SECRET ()
+   #2  0x000000000040076e in main ()
+
+   (gdb) n
+   Single stepping until exit from function gettimeofday,
+   which has no line number information.
+   0x00000000004010f7 in SECRET ()
+   (gdb) where
+   #0  0x00000000004010f7 in SECRET ()
+   #1  0x000000000040076e in main ()
+   (gdb)
+
+   (gdb) disassemble $pc, +10 # assembly code right after the call to gettimeofday
+   Dump of assembler code from 0x4010f7 to 0x401101:
+   => 0x00000000004010f7 <SECRET+2372>:	mov    %eax,(%rbx)
+      0x00000000004010f9 <SECRET+2374>:	jmp    0x401123 <SECRET+2416>
+      0x00000000004010fb <SECRET+2376>:     lea    -0x90(%rbp),%rax
+       End of assembler dump.
+   (gdb)
+
+   0x00000000004010f9 in SECRET ()
+   (gdb) si
+   0x0000000000401123 in SECRET ()
+   (gdb) info registers rax
+   rax            0x0	0
+   (gdb) info registers rbp
+   rbp            0x7fffffffe7b0	0x7fffffffe7b0
+   (gdb) x/d 0x7fffffffe7b0
+   0x7fffffffe7b0:	-6144
+   (gdb)
+   
+   Note: I repeated this single stepping for quite a while and found out
+   it is impossible to get out of it because seems that I was falling into
+   a loop with a big switch statement inside of it.
+
+   So I just let the program continue to run:
+   
+   (gdb) c
+   Continuing.
+
+   Program received signal SIGSEGV, Segmentation fault.
+   0x0000000000400ff5 in SECRET ()
+   (gdb)
+
+   It says it broke down at the instruction stored at address 0x400f5, this
+   is where $pc is pointing to.
+
+   So I bring up the assembly code at this address:
+   
+   (gdb) print $pc
+   $1 = (void (*)()) 0x400ff5 <SECRET+2114>
+   (gdb) display/i $pc
+   1: x/i $pc
+   => 0x400ff5 <SECRET+2114>:	mov    %rdx,(%rax)
+   (gdb)
+   
+   So here it tries to copy the value stored in $rdx into the address whose
+   value was stored at $rax.
+
+   So I print out the value stored at $rax:
+
+   (gdb) print $rax
+   $2 = 0
+   (gdb) 
+
+   This is obvious a NULL pointer violation! Something like: 
+   *(void *)NULL = 123456 happend. Horrible!
+
+8. Then I open up the disassembled code challenge.s and locate
+   the corresponding instruction that caused NULL pointer violation.
+
+   674  400ff5:       48 89 10                mov    %rdx,(%rax)
+
+   So the instruction has 3 bytes. Since it doesn't do anything meaningful,
+   I decided to rewrite these three bytes with nop(0x90) code.
+
+9. quit the current gdb session.
+
+10. Make a backup copy of challenge and then reopen gdb with -write option.
+
+    gdb -write -q challenge
+
+    set {unsigned char}0x400ff5 = 0x90
+    set {unsigned char}0x400ff6 = 0x90
+    set {unsigned char}0x400ff7 = 0x90
+    quit
+
+11. Run the modified executable and it works! 
+    Basically the program takes any type of argument(no matter it is a
+    digital number, a alphebet string, or mix of digits and alphabet), do
+    some calculation interally, and return a big integer value which depends
+    on the input argument.
+
+    Seems that the source code from which the executable compiled into was
+    abfuscated already!
+
+12. use vbindiff to compare the hacked executable with the original one
+    to see the difference.

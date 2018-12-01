@@ -1,0 +1,206 @@
+I/277               SPM Catalog 2.0                          (Platais+ 1998)
+================================================================================
+Yale/San Juan Southern Proper Motion Program:
+ -20 to -40{deg} zones including the South Galactic Pole Region
+     Platais I., Girard T.M., Kozhurina-Platais V., van Altena W.F., Lopez C.E.,
+     Mendez R.A., Ma W.-Z., Yang T.-G., MacGillivray H.T., Yentis D.J.
+    <Astron. J. 116, 2556 (1998)>
+    =1998AJ....116.2556P
+================================================================================
+ADC_Keywords: Positional data ; Proper motions ; Photometry, photographic ;
+              Photometry, CCD
+Keywords: astrometry - catalogs - stars: kinematics
+
+Description:
+    The SPM Catalog 2.0 provides positions, absolute proper motions and
+    photographic BV photometry for over 320,000 stars and galaxies. The
+    Catalog covers an area of ~3700 square degrees in an irregularly
+    bounded band between declinations of -43 and -22 degrees, with a
+    slight extension near the South Galactic Pole, but excluding fields in
+    the plane of the Milky Way. Stars cover the magnitude range 5<V<18.5.
+    The standard errors for the best measured stars are as follows: 20 mas
+    for positions in each coordinate; 2mas/yr for absolute proper motions
+    and 0.05mag for B and V magnitudes. Standard error estimates of
+    positions, absolute proper motions and magnitudes are given for each
+    individual object. In addition to the Catalog, a list of CCD
+    calibrating sequences is provided.
+
+    Note that all fields (and objects) contained in the 1.0 version of the
+    Catalog are also included in this version. The values of the
+    astrometric parameters for these objects, however, may be different
+    due to refinements in the reduction procedure, (i.e. the SGP fields
+    were re-reduced for inclusion in the SPM catalog 2.0).
+
+File Summary:
+--------------------------------------------------------------------------------
+ FileName    Lrecl  Records   Explanations
+--------------------------------------------------------------------------------
+ReadMe          80        .   This file
+readme.ori      80      374   Original description
+spmcat.dat     129   321608   Catalog of positions, proper motions and BV
+                               photographic photometry in the area around the
+                               South Galactic Pole
+spmccd.dat      42     7783   A list of CCD photometry used for magnitude
+                               calibration in the SGP area
+spmfld.dat      63      156   Basic information on the SPM fields/plates used
+                               to create the Catalog
+spmids.txt      31   262150   Cross-identifications with special catalogs and
+                               object numbers for the selected samples of stars
+spmpar.txt      33       71   A list of parameters used to make identifications
+                               with special catalogs
+spmspe.txt      79       77   A list of all special catalogs and selected
+                               samples of stars
+--------------------------------------------------------------------------------
+
+See also:
+   I/177 : Catalogue of proper motions in NGC 752 (Platais, 1992)
+   I/178 : Catalogue of proper motions in NGC 7209 (Platais, 1992)
+   I/203 : Proper Motions, UBV-Phot. Spectral Class Region 7092 (Platais 1994)
+   I/212 : Proper motions in NGC 3680 (Kozhurina-Platais+, 1995)
+   J/AJ/122/1486 : NGC 2451A proper motions and membership (Platais+, 2001)
+
+Byte-by-byte Description of file: spmcat.dat
+--------------------------------------------------------------------------------
+   Bytes Format Units    Label Explanations
+--------------------------------------------------------------------------------
+   1-  8  I8    ---      SPM   Object identifier (1)
+  10- 11  I2    h        RAh   Right ascension for the epoch J1991.25 and in
+                                the ICRS reference system (i.e. equinox 2000)
+  13- 14  I2    min      RAm   Right ascension for the epoch J1991.25 and in
+                                the ICRS reference system (i.e. equinox 2000)
+  16- 21  F6.3  s        RAs   Right ascension for the epoch J1991.25 and in
+                                the ICRS reference system (i.e. equinox 2000)
+      23  A1    ---      DE-   Declination sign (2000)
+  24- 25  I2    deg      DEd   Declination for the epoch J1991.25 and in the
+                                ICRS reference system (i.e. equinox 2000)
+  27- 28  I2    arcmin   DEm   Declination for the epoch J1991.25 and in the
+                                ICRS reference system (i.e. equinox 2000)
+  30- 34  F5.2  arcsec   DEs   [0/60] Declination for the epoch J1991.25 and in
+                                the ICRS reference system (i.e. equinox 2000)
+  36- 45  F10.6 deg      RAdeg Right ascension in decimal degrees (2000)
+  47- 56  F10.6 deg      DEdeg Declination in decimal degrees (2000)
+  57- 60  I4    mas    e_RAdeg Estimated standard error in right ascension
+                                multiplied by cos(DEC).
+  61- 64  I4    mas    e_DEdeg Estimated standard error in declination
+  66- 72  F7.1  mas/yr   pmRA  Absolute proper motion in right ascension
+                                multiplied by cos(DEC).
+  74- 80  F7.1  mas/yr   pmDE  Absolute proper motion in declination
+  81- 85  F5.1  mas/yr e_pmRA  Estimated standard error in right ascension's
+                                absolute proper motion.
+  86- 90  F5.1  mas/yr e_pmDE  Estimated standard error in declination's
+                                absolute proper motion.
+  92- 96  F5.2  mag      Vmag  ?=0.00 Photographic V-magnitude
+                                (if missing then set to 0.00)
+  98-102  F5.2  mag      Bmag  ?=0.00 Photographic B-magnitude
+                                (if missing then set to 0.00)
+ 104-108  F5.2  mag      B-V   ?=0.00 B-V color (if either of V or B is missing
+                                then set to 0.00).
+ 109-111  I3   0.01mag e_Vmag  Estimated standard error in V- magnitude
+ 112-114  I3   0.01mag e_Bmag  Estimated standard error in B- magnitude
+     118  I1    ---      Nfie  Number of SPM fields on which the object was
+                                measured.
+ 120-121  I2    ---    o_Bmag  Number of images used in astrometric reductions
+                                from a blue plate in each epoch (2)
+ 123-124  I2    ---    o_Vmag  Number of images used in astrometric reductions
+                                from a visual plate in each epoch (2)
+     126  A1    ---      F1    [HT] Flag "H" indicates a Hipparcos star;
+                                    flag "T" indicates a Tycho star if it is
+                                     not already a Hipparcos star
+     127  A1    ---      F2    [GKQ] Selection flag (3)
+     128  A1    ---      F3    [AS] Specific flag (4)
+--------------------------------------------------------------------------------
+Note (1): First three digits indicate the SPM field number. The remaining
+     digits are the running number in the SPM input file.
+Note (2): Each first and second order grating-image pair counted as one image
+Note (3): the flags have the following meaning:
+     Flag "G" indicates visually confirmed galaxy;
+     Flag "K" indicates a randomly selected star.
+          Note that star selections 011 and 054 also share that flag;
+     Flag "Q" indicates a possible QSO drawn from the following special
+          catalogs: 022,027,042,052 (see spmspe.txt).
+Note (4): the flags have the following meaning:
+     Flag "S" indicates a special star taken from a selected catalog or list.
+     Flag "A" indicates a star which was chosen in some specified area down
+           to a specified magnitude limit.
+          This includes special catalogs: 012,024,037,050,055 (see spmspe.txt).
+--------------------------------------------------------------------------------
+
+Byte-by-byte Description of file: spmccd.dat
+--------------------------------------------------------------------------------
+   Bytes Format Units   Label     Explanations
+--------------------------------------------------------------------------------
+   1-  8  I8    ---     SPM       Object number (1)
+  10- 19  F10.6 deg     RAdeg     Right ascension (2000) (2)
+  21- 30  F10.6 deg     DEdeg     Declination (2000) (2)
+  32- 36  F5.2  mag     Vmag      V-magnitude from CCD photometry
+  38- 42  F5.2  mag     B-V       B-V color from CCD photometry
+--------------------------------------------------------------------------------
+Note (1): First three digits indicate the SPM field number.
+     The remaining digits are the running number in the SPM input file.
+Note (2): Positions for the epoch 1991.25 and in the ICRS reference system
+     (copied from the Catalog file spmcat.dat)
+--------------------------------------------------------------------------------
+
+Byte-by-byte Description of file: spmfld.dat
+--------------------------------------------------------------------------------
+   Bytes Format Units      Label  Explanations
+--------------------------------------------------------------------------------
+   1-  3  I3    ---        SPM    The SPM field number (1)
+   5-  6  I2    h          RAh    Field center right ascension (J2000)
+   8-  9  I2    min        RAm    Field center right ascension (J2000)
+  11- 15  F5.2  s          RAs    Field center right ascension (J2000)
+      17  A1    ---        DE-    Sign of declination (J2000)
+  18- 19  I2    deg        DEd    Field center declination (J2000)
+  21- 22  I2    arcmin     DEm    Field center declination (J2000)
+  24- 27  F4.1  arcsec     DEs    Field center declination (J2000)
+  32- 41  A10 "DD/MM/YYYY" DATE1  First epoch blue-plate exposure date
+  44- 45  A2    ---        GR1    [EW NS] Grating image orientation on first
+                                   epoch blue plates (East-West or North-South)
+  50- 59  A10 "DD/MM/YYYY" DATE2  Second epoch blue-plate exposure date
+  62- 63  A2    ---        GR2    [EW NS] Grating image orientation on second
+                                   epoch blue plates (East-West or North-South)
+--------------------------------------------------------------------------------
+Note (1): In this file the basic data are provided for each of the
+    selected 156 SPM fields. However, the Catalog's object numbers may
+    contain some adjacent SPM field numbers which are not presented in
+    this file. This is because in the field overlap area the object ID is
+    assigned based on the field with the nearest plate center. This
+    procedure will ensure consistency in the numbering system with
+    adjacent fields incorporated in future versions of the Catalog.
+
+    SPM fields for which the exposure date of visual plates is different
+    from the blue plate. The field centers at the equinox B1950 can be
+    found in Platais et al. (1998A&A...331.1119P).
+     ------------------------------------------------------------------
+      Field     Date 1            Date 2
+     ------------------------------------------------------------------
+      385                        30/07/1987  NS
+      459       22/09/1998  EW
+      600       21/09/1968  EW
+      420                         7/02/1997  EW
+      449       21/09/1968  EW
+      515        8/08/1969  EW
+      516                         5/09/1996  NS
+      525       30/07/1968  EW
+      526       20/09/1968  EW
+      569                        21/02/1993  NS
+     ------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+History:
+    Copied at http://www.astro.yale.edu/astrom
+
+References:
+ Girard et al., 1998AJ....115..855G
+   "The Southern Proper Motion Program. I. Magnitude equation correction"
+
+ Platais et al., 1998A&A...331.1119P
+  "The Hipparcos proper motion link to the extragalactic reference system using
+    NPM and SPM"
+
+ Platais et al., 1998AJ....116.2556P
+  "The Southern Proper Motion Program. II. A Catalog at the South Galactic Pole"
+
+================================================================================
+(End)                                        Patricia Bauer [CDS]   15-Jan-2002
+

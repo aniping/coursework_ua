@@ -1,0 +1,106 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX template for reading report
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools,enumitem}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS525}
+\def\ReportNo{13}
+\def\Category{Reading Report}
+\def\PaperTitle{A Case for End System Multicast}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \Category
+
+\begin{center}
+Reading Report \#\ReportNo\\
+Paper: \PaperTitle\\
+Student: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+\vspace{1.5em}
+
+Narada protocol is suitable only for multicast application with a
+small group size (a few hundred nodes), for example, video
+conferencing. Beyond all the well-known 
+benefits of implementing multicast functionality on a overlay network,
+the major problem of Narada is scalability. This is because:
+
+\begin{enumerate}
+\item Each node in the group needs to carry out the duplicating and
+  forwarding operations, manage group membership, as well as
+  performing application specific functionalities. The first two are
+  usually implemented by multicast router in IP multicast.
+\item Each node in the overlay network has to maintain a list of all
+  the nodes that are currently in the network. This is too much
+  overhead for a end host when the size of the overlay network scales
+  up.
+\item The size of routing table for each node is linear to the size of
+  the group. Therefore the state maintained by a node is in the order
+  of $O(N)$ where $N$ is the size of group.
+\item Since each node manages both data plane and control plane, the
+  control overhead is big because each control message contains the
+  state of all nodes in the group, thus the control overhead is in the
+  order of $O(N^2)$ where $N$ is the size of group.
+\end{enumerate}
+
+Another potential problem of Narada is that it takes a long time to
+converge and the overlay network tends to be instable because
+simulation results show that it is difficult to form a stable mesh,
+even after a very long time. 
+
+\vspace{1em}
+I think in order to make the idea of end-system-multicast scale to
+large size, we need to let the network layer and end system cooperate,
+each sharing some workload. For example, one of the most challenging
+tasks in overlay networks is the management of node dynamics, that is,
+let nodes join and leave the group at their will. In traditional IP
+multicast network, node dynamics is not a major concern as the
+network infrastructure is considered to be stable and only the leaf
+nodes join and leave the network. But for overlay network, this is not
+the case any more, node dynamics is completely managed by end system.
+This may affect application performance, especially, those real time
+network application may suffer from managing node dynamics. 
+
+\vspace{1em}
+The combination of the two different multicast schemes can be
+adopted for general-purpose scalable multicast network. Though we need 
+to carefully evaluate the division of functionalities and try to put
+as less function to network as possible. But still, network itself
+needs to play a role here.
+
+
+\vspace{1em}
+
+
+\end{document}

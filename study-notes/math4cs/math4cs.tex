@@ -1,0 +1,201 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is the LaTeX file for study notes for the MIT 6.042.
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{Math4CS Notes}
+\def\DateHandedOut{Dec, 2014}
+\def\DateDue{Dec 28}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \DateHandedOut
+
+\begin{center}
+Math4CS\\
+Date: \DateDue\\
+Student: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+
+\section{Induction}
+
+% Enumerate through all questions.
+\begin{enumerate}
+
+\item \textbf{Courtyard Tiling}\\
+
+  The problem is to tile a courtyard with dimensions $2^n \times
+  2^n$. We are required to install a statue of a wealthy donor in one
+  of the central square, and only special L-shaped tiles can be
+  used. We need to prove this is feasible.
+  
+  \textbf{Theorem} For all $n \geq 0$ there exists a tiling of a $2^n
+  \times 2^n$ courtyard with the donor in a central square. 
+  \begin{proof}
+    Prove by induction. Let $P(n)$ be the proposition that there
+    exists a tiling of a $2^n \times 2^n$ courtyard with the donor
+    placed in any location.
+
+  \emph{Base case}: $P(0)$ is true because the donor fills the whole
+  courtyard.
+
+  \emph{Inductive step}: Suppose $P(n)$ is true, we need to prove that
+  $P(n) \rightarrow P(n+1)$. A $2^{n+1} \times 2^{n+1}$ courtyard
+  consists of four $2^n \times 2^n$ quadrants, each of them can be tiled
+  with the donor placed in any location. Let the donor be in one of
+  the four central squares, and the remaining three central squares
+  can fit a L-shaped tile. Now we can tile each of the four quadrants
+  by the induction hypothesis. This proves that $P(n) \rightarrow
+  P(n+1)$. The theorem follows as a special case.
+  \end{proof}
+
+\end{enumerate}
+
+\section{Graph}
+
+\begin{enumerate}
+  \item 
+    \textbf{Theorem}. Every graph $G=(V,E)$ has at least $|V|-|E|$
+    connected components.
+    \begin{proof}
+      We use induction on the number of edges. Let $P(n)$ be the
+      proposition that every graph $G=(V,E)$ has at least $|V|-n$
+      connected components where $|E|=n$. 
+
+      \emph{Base case:} In a graph where $|E|=0$, every vertex is a
+      connected component itself, thus the graph has exactly
+      $|V|-0=|V|$ connected components. 
+
+      \emph{Inductive step:} Assume that $P(n)$ holds for $n \geq 0$,
+      that is, a graph with $|E|=n$ has at least $|V|-n$ connected
+      components. Consider a graph with $n+1$ edges. Remove an edge
+      $(u,v)$ to create a $n$-edge graph $G'$, which has at least
+      $|V|-n$ connected components. Now add $(u,v)$ to obtain the
+      original graph $G$. If
+      $u$ and $v$ were in the same connected component of $G'$, then
+      $G$ has the same number of connected components as $G'$. If $u$
+      and $v$ were in the different connected components of $G'$, then
+      adding $(u,v)$ would merge these two components of $G'$ into one in
+      $G$, but all other components remain. In both cases, the number
+      of connected components in $G$ is at least $|V|-n-1=|V|-(n+1)$.
+
+      The theorem follows by induction. 
+    \end{proof}
+
+  \item
+    \textbf{Theorem}. Let $G$ be a digraph(possible with self-loops)
+    with vertices $v_1, \cdots, v_n$. Let $M$ be the adjacency matrix
+    of $G$. Then $M_{ij}^k$ is equal to the number of length-$k$ walk
+    from $v_i$ to $v_j$.
+    \begin{proof}
+      We use induction on $k$. Let $P(k)$ be the proposition that the
+      number of length-$k$ walk from $v_i$ to $v_j$ is $M_{ij}^k$, for
+      all $i,j$. 
+
+      \emph{Base case:} for $k=0$, a vertex only has length-$0$ walk
+      to itself. Since $M^0$ is the identity matrix, $P(0)$ holds. 
+
+      \emph{Inductive step:} Assume $P(k)$ holds, we will prove that
+      $M_{ij}^{k+1}$ is equal to the number of length-$(k+1)$ walk
+      from $v_i$ to $v_j$. A length-$(k+1)$ walk from $v_i$ to $v_j$
+      consists of a walk of length-$k$ from $v_i$ to some intermediate
+      vertex $v_m$ followed by an edge $(v_m, v_j)$. Therefore, the
+      number of $M_{ij}^{k+1}$ is equal to:
+
+      \begin{equation}
+        M_{iv_1}^{k}M_{v_1j} + M_{iv_2}^{k}M_{v_2j} + \cdots +
+        M_{iv_n}^{k}M_{v_nj} 
+      \end{equation}
+      This is exactly $M_{ij}^{k+1}$, thus $P(k+1)$ also holds. The
+      theorem follows by induction.
+    \end{proof}
+
+  \item
+    \textbf{Theorem}. Every tree $T=(V,E)$ has the following
+    properties:
+    \begin{enumerate}
+    \item There is a unique path between every pair of vertices.
+      \begin{proof}
+        There is at least one path between every pair of vertices
+        since the graph is connected. Suppose that there are two
+        different paths between vertices $u$ and $v$. Beginning at
+        $u$, let $x$ be the first vertex where paths diverge, and let
+        $y$ be the next vertex they share. Then there are two paths
+        between $x$ and $y$ with no common edges, which creates a
+        cycle. This is a contradiction since the graph is
+        acyclic. Therefore there is exactly one path between every
+        pair of vertices.
+      \end{proof}
+    \item Adding any edge creates a cycle.
+      \begin{proof}
+        Suppose an edge was added between vertices $u$ and $v$. Since
+        there is already a path between $u$ and $v$, this edge creates
+        another path from $u$ to $v$. This contradicts the fact that
+        there can be only one path between every pair of vertices.
+      \end{proof}
+    \item Removing any edge disconnect the graph.
+      \begin{proof}
+        Suppose that removing an edge between $u$ and $v$ doesn't
+        disconnect the graph, then there is another path between $u$
+        and $v$ exists. This contradicts the fact that
+        there can be only one path between every pair of vertices.
+      \end{proof}
+    \item Every tree with at least two vertices has at least two
+      leaves.
+      \begin{proof}
+        Suppose the sequence $v_1v_2 \cdots v_m$ is the longest path in
+        $T$. Then $m \geq 2$, since a tree with two vertices must
+        contain at least one edge. There cannot be an edge between
+        $v_1$ and $v_i$ for $2 < i \leq m$, because otherwise
+        $v_1 \cdots v_i$ would form a cycle. There cannot also be an
+        edge between $v_1$ and $u$ for some vertex $u$ that is not on
+        the path, because otherwise the path would be
+        longer. Therefore the only edge incident to $v_1$ is $(v_1,
+        v_2)$, which means that $v_1$ is a leaf. By a symmetric
+        argument, $v_m$ is also a leaf.
+      \end{proof}
+    \item $|V| = |E| + 1$.
+      \begin{proof}
+        We use induction on $|V|$. For the tree with a single vertex,
+        the claim holds because $|E|+1=0+1=1=|V|$. Suppose that the
+        claim holds for all $n$-vertex tree and consider an
+        $(n+1)$-vertex tree $T$. Let $v$ be a leaf of the tree. Deleting
+        $v$ and its incident edge gives us a $n$-vertex tree where
+        $|V|=|E|+1$ holds. Now add the vertex $v$ and its incident
+        edge back, then the equation still holds because both the
+        number of vertices and edges increase by 1. Thus the claim
+        holds for $T$ and, by induction, for all trees.
+      \end{proof}
+    \end{enumerate}
+\end{enumerate}
+
+\end{document}

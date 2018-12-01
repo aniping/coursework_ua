@@ -1,0 +1,94 @@
+all: out1.c out2.c out3.c
+
+# Basic one level virtualization 
+out1.c: program.c
+	tigress --Transform=InitEntropy --Functions=main \
+		--Transform=InitOpaque --Functions=main \
+		--InitOpaqueCount=2 --InitOpaqueStructs=list,array \
+		--Transform=Virtualize --Functions=super_fancy_encryption \
+		--VirtualizeDispatch=switch \
+		--Transform=Virtualize --Functions=authentication \
+		--VirtualizeDispatch=ifnest \
+		--Transform=EncodeLiterals \
+		--EncodeLiteralsKinds=string \
+		--EncodeLiteralsEncoderName=STRINGS \
+		--Functions=authentication \
+		--Transform=CleanUp --CleanUpKinds=annotations \
+		--out=$@ $<
+
+# two-level virtualization combined with other techniques
+out2.c: program.c
+	tigress --FilePrefix=x --FilePrefix=v1 \
+		--Transform=InitEntropy --Functions=main \
+		--Transform=InitOpaque --Functions=main \
+		--InitOpaqueCount=2 --InitOpaqueStructs=list,array \
+		--Transform=Virtualize --Functions=super_fancy_encryption \
+		--VirtualizeDispatch=ifnest \
+		--Transform=Virtualize --Functions=super_fancy_encryption \
+		--VirtualizeDispatch=indirect \
+		--Transform=Virtualize --Functions=authentication \
+		--VirtualizeDispatch=binary \
+		--Transform=Virtualize --Functions=authentication \
+		--VirtualizeDispatch=call \
+		--VirtualizeMaxDuplicateOps=2 --VirtualizeOperands=* \
+		--VirtualizeSuperOpsRatio=2.0 --VirtualizeMaxMergeLength=10 \
+		--VirtualizeOptimizeBody=true \
+		--Transform=CleanUp --CleanUpKinds=annotations \
+		--out=$@ $<
+
+# 2 level virtualize + split + 2 level flatten + arithmetic 
+# + literal-string encoding + virtulize => virtulize
+out3.c: program.c
+	tigress --Transform=InitEntropy --Functions=main \
+		--Transform=InitOpaque --Functions=main \
+		--InitOpaqueCount=2 --InitOpaqueStructs=list,array \
+		--VirtualizeMaxDuplicateOps=2 --VirtualizeOperands=* \
+		--VirtualizeSuperOpsRatio=2.0 --VirtualizeMaxMergeLength=10 \
+		--VirtualizeOptimizeBody=true \
+		--Transform=Virtualize --Functions=super_fancy_encryption \
+		--VirtualizeDispatch=switch \
+		--Transform=Virtualize --Functions=super_fancy_encryption \
+		--VirtualizeDispatch=interpolation \
+		--Transform=Virtualize --Functions=authentication \
+		--VirtualizeDispatch=call \
+		--Transform=Flatten --Functions=super_fancy_encryption \
+		--FlattenDispatch=goto \
+		--Transform=Flatten --Functions=super_fancy_encryption \
+		--FlattenDispatch=indirect \
+		--Transform=Flatten --Functions=authentication \
+		--FlattenDispatch=* \
+		--Transform=Flatten --Functions=authentication \
+		--FlattenDispatch=* \
+		--Transform=EncodeArithmetic --Functions=super_fancy_encryption \
+		--Transform=EncodeArithmetic --Functions=authentication \
+		--Transform=Split --Seed=0 --SplitKinds=deep,block,top \
+		--SplitCount=100 --Functions=super_fancy_encryption \
+		--Transform=Split --Seed=0 --SplitKinds=deep,block,top \
+		--SplitCount=100 --Functions=authentication \
+		--Transform=EncodeLiterals \
+		--EncodeLiteralsKinds=string \
+		--EncodeLiteralsEncoderName=STRINGS \
+		--Functions=authentication \
+		--Transform=CleanUp --CleanUpKinds=annotations \
+		--out=$@ $<
+
+out1: out1.c
+	gcc -o $@ $<
+
+out2: out2.c
+	gcc -o $@ $<
+
+out3: out3.c
+	gcc -o $@ $<
+
+run: out1 out2 out3
+	@echo
+	time -f "\t%E real,\t%U user,\t%S sys" ./out1 qoiqueorzcvnlzvnjhdgsoaoiruqjgnDajsfdapoafj
+	@echo
+	time -f "\t%E real,\t%U user,\t%S sys" ./out2 qoiqueorzcvnlzvnjhdgsoaoiruqjgnDajsfdapoafj
+	@echo
+	time -f "\t%E real,\t%U user,\t%S sys" ./out3 qoiqueorzcvnlzvnjhdgsoaoiruqjgnDajsfdapoafj
+	@echo
+
+clean:
+	rm out*

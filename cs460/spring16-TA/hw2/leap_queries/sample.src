@@ -1,0 +1,7 @@
+##
+## What is the color of the Pith helmet?
+##
+
+q0r1 = select (item) (itemname='Pith_helmet')
+display ( project ( q0r1 ) (itemcolor) )
+

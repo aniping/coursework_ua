@@ -1,0 +1,4 @@
+q9r1 = join (select (department) (deptfloor="2")) (sale) (deptname=dname)
+q9r2 = (project (sale) (itemno)) difference (project (q9r1) (itemno))
+q9r3 = project (join (q9r2) (item) (item# = itemno)) (itemname)
+display q9r3

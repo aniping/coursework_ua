@@ -1,0 +1,151 @@
+
+<!-- saved from url=(0072)http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/system/globals.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title> Minibase Global Variables </title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+<body><!--msnavigation-->
+
+<!--<table border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td>
+
+<p align="center">&nbsp;</p>
+<table border="0" width="100%">
+  <tbody><tr>
+    <td width="12%"><a href="./globals_files/book3ed.jpg"><img border="0" src="./globals_files/book3ed.jpg" width="80" height="106"></a></td>
+    <td width="88%"><h1 align="center"><font size="6"><strong>Database Management Systems</strong></font></h1>
+      <p align="center">by <a href="http://www.cs.wisc.edu/~raghu">Raghu
+      Ramakrishnan</a> and <a href="http://www.cs.cornell.edu/johannes">Johannes
+      Gehrke</a></p>
+      <p align="center">
+</p>
+    </td>
+  </tr>
+</tbody></table>
+<p align="center"><img border="0" src="./globals_files/hline.gif" align="left" width="800" height="2"></p>
+
+</td></tr></tbody></table>-->
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tbody>
+			<tr>
+				<td>
+					<p align="center">&nbsp;</p>
+					<table border="0" width="100%">
+					  <tbody>
+						<tr>
+						    <td width="88%">
+							<p align="left"><img border="0" src="uadcs.gif" align="center"></p>
+							<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+							<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+							<!--<p align="center"><font size="4"><a href="http://www.cs.arizona.edu" target="_blank">Department of Computer Science</a></font></p>
+							<p align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</a></font></p>-->
+							<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+							<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+							<!--<h3 align="center"><font size="4">Department of <a href="http://www.cs.arizona.edu" target="_blank">Computer Science</a></font></h3>
+							<h3 align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</font></h3>
+							<h3 align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></h3>-->
+						     	 <!--<p align="center">
+						<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/index.html" target="" style="{text-decoration: none;}">Database&nbsp;Management&nbsp;Systems&nbsp;(3rd&nbsp;Edition)</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.dist.html" target="" style="{text-decoration: none;}">The&nbsp;Minibase&nbsp;Distribution</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/single_user.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Overview</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/project.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Modules</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.notice.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Terms&nbsp;and&nbsp;Agreement</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/history.html" target="" style="{text-decoration: none;}">Minibase&nbsp;History</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minidoc.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Documentation</a>]</nobr></p>-->
+							</td>
+ 						</tr>
+					  </tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+<br>
+
+<table dir="ltr" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><!--msnavigation--><td valign="top">
+
+
+<h1> minibase_globals </h1>
+<img border="0" src="hline.gif" width="1024" height="2">
+<p>
+
+   The <strong>minibase_globals</strong> variable is a pointer to a
+   SystemDefs object.  The SystemDefs class has public data members
+   for the various components of the system: the buffer manager, the
+   disk space manager, and so on.  These are referred to throughout
+   the Minibase code by C preprocessor macros declared in
+   system_defs.h; for example, MINIBASE_BM for the buffer manager.
+</p><p>
+
+   This object, minibase_globals, is responsible for creating all its
+   constituent objects to create or open a Minibase database, and for
+   destroying them all to close it again.  You open a database by
+   creating a SystemDefs object and assigning it to minibase_globals,
+   and you close it by deleting minibase_globals.
+
+</p><p>
+
+   There can only be one instance of the SystemDefs class, and it is
+   always pointed to by minibase_globals.
+
+</p><p>
+<img border="0" src="hline.gif" width="1024" height="2">
+</p><h2> The SystemDefs Class </h2>
+
+   The base SystemDefs class provides slots for the buffer manager (BufMgr class, called
+MINIBASE_BM), the disk space manager (DB
+   class, called MINIBASE_DB), and the name of the Unix file that
+   holds the database (called MINIBASE_DBNAME).
+
+<p>
+<img border="0" src="hline.gif" width="1024" height="2">
+</p><h2> The ExtendedSystemDefs Class</h2>
+
+   ExtendedSystemDefs is a subclass of SystemDefs that adds the
+   Minibase catalogs to the structure.  When you need to use the
+   catalog system, i.e. when you are working with relations rather
+   than the lower-level components of Minibase, you create an
+   ExtendedSystemDefs object in place of a SystemDefs object.
+
+<p>
+
+   In addition to managing the catalog objects for Minibase proper,
+   ExtendedSystemDefs also creates a systemCatalogs object (see below)
+   that knows how to read the Minibase catalogs.  This includes the
+   optimizer, which can operate autonomously from a Minibase database,
+   into the system and lets it work with real data.
+
+</p><p>
+
+   The reason for separating the catalogs from the rest of the system
+   is simply to allow the lower levels of the software to be used
+   without imposing the higher-level structure required by the
+   catalogs.
+
+
+</p><p>
+<img border="0" src="hline.gif" width="1024" height="2">
+</p><h1> systemCatalogs </h1>
+
+   The systemCatalogs global variable is a pointer to an
+   ii_SystemCatalogs object.  The ii_SystemCatalogs class is an
+   abstract class that returns information about the current catalog
+   for use by the optimizer subsystem.
+
+<p>
+
+   There are two concrete subclasses of ii_SystemCatalogs:
+   ii_BogusSystemCatalogs and ii_MinibaseSystemCatalogs.  The "bogus"
+   one reads a "bogus catalog" file, which is a text file that
+   contains catalog information without the need for an actual
+   database behind it.  This is useful for learning about how
+   optimizers work in different catalog environments.  The other one
+   actually reads the Minibase global catalogs of the current open
+   database.
+</p>
+<p>
+<img border="0" src="hline.gif" width="1024" height="2">
+</p>
+<p><a href="./project.html">Back to the List of Components</a><br>
+<a href="./index.html">Back to the Minibase Home Page</a><br>
+</p><p>
+
+<!--msnavigation--></p></td></tr><!--msnavigation--></tbody></table>
+
+
+</body></html>

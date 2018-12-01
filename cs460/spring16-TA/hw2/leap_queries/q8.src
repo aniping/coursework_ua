@@ -1,0 +1,6 @@
+q8r1 = select (department)(deptfloor <> "2")
+q8r2 = join (q8r1) (sale) (deptname = dname)
+q8r3 = project (q8r2) (itemno)
+q8r4 = join (q8r3) (item) (itemno = item#)
+q8r5 = project (q8r4) (itemname)
+display q8r5

@@ -1,0 +1,95 @@
+
+<!-- saved from url=(0067)http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/miniusage.html -->
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Using Minibase</title>
+	<meta name="Microsoft Border" content="t, default">
+</head>
+<body><!--msnavigation-->
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tbody>
+			<tr>
+				<td>
+					<p align="center">&nbsp;</p>
+					<table border="0" width="100%">
+					  <tbody>
+						<tr>
+						    <td width="88%">
+							<p align="left"><img border="0" src="uadcs.gif" align="center"></p>
+							<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+							<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+							<!--<p align="center"><font size="4"><a href="http://www.cs.arizona.edu" target="_blank">Department of Computer Science</a></font></p>
+							<p align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</a></font></p>-->
+							<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+							<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+							<!--<h3 align="center"><font size="4">Department of <a href="http://www.cs.arizona.edu" target="_blank">Computer Science</a></font></h3>
+							<h3 align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</font></h3>
+							<h3 align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></h3>-->
+						     	 <!--<p align="center">
+						<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/index.html" target="" style="{text-decoration: none;}">Database&nbsp;Management&nbsp;Systems&nbsp;(3rd&nbsp;Edition)</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.dist.html" target="" style="{text-decoration: none;}">The&nbsp;Minibase&nbsp;Distribution</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/single_user.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Overview</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/project.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Modules</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.notice.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Terms&nbsp;and&nbsp;Agreement</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/history.html" target="" style="{text-decoration: none;}">Minibase&nbsp;History</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minidoc.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Documentation</a>]</nobr></p>-->
+							</td>
+ 						</tr>
+					  </tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<table dir="ltr" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><!--msnavigation--><td valign="top">&nbsp;
+<h2>Using Minibase</h2>
+<p>
+<img border="0" src="./hline.gif" width="800" height="2">
+</p><p>
+   
+Users of Minibase will need to set two environment variables:
+</p><p>
+   "MINIBASE_ROOT", and "PLATFORM".
+</p><p>
+     In csh, this is done with:
+</p><p>
+</p><pre>     setenv MINIBASE_ROOT /usr/local/minibase
+     setenv PLATFORM `$MINIBASE_ROOT/bin/sysname`
+</pre>
+<p>
+  Where <i>/usr/local/minibase</i> is replaced by the path to the
+  root directory where you plan to put the Minibase code.
+  These lines should be added in one of your startup files,
+  for example, <i>.cshrc</i> for csh users.
+</p><p>
+  Users should also add <i>$MINIBASE_ROOT/bin</i> to their search
+  path. This is usually done by modifying the 'path' variable.
+  For csh users the line:
+</p><p>
+</p><pre>    set path = ( $path $MINIBASE_ROOT/bin )
+</pre>
+<p>
+  will add the directory to the end of your search path.  
+</p><p>
+
+<img border="0" src="./hline.gif" width="800" height="2">
+</p><p>
+</p><h2>Running Minibase</h2>
+<p>
+<img border="0" src="./hline.gif" width="800" height="2">
+</p><p>
+The text-based interface to Minibase can be invoked by
+using the command <b>minibase</b>, which has the following
+command-line options:
+</p><ul>
+<li> <b>-d</b> <i>database name</i> (required)
+</li><li> <b>-s</b> <i>size of the DB in pages</i>
+</li><li> <b>-b</b> <i>size of the buffer pool in pages</i>
+</li><li> <b>-r</b> <i>reopen mode; used to reopen an existing database</i>
+</li></ul>
+
+<img src="./hline.gif" width="800" height="2">
+<br>
+<a href="project.html">Back to the List of Components</a><br>
+<a href="minibase.html">Back to the Minibase Home Page</a><br>
+<p>
+
+<!--msnavigation--></p></td></tr><!--msnavigation--></tbody></table>
+
+
+</body></html>

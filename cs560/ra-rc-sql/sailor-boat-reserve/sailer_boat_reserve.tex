@@ -1,0 +1,248 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Relational algebra & relational calculus for Sailer-Reserve-Boat
+% schema in the DBMS book.
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\begin{center}
+  Sailer-Boat-Reserve Queries\\
+  \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+
+\vspace{1em}
+\underline{Schema}:
+\vspace{1em}
+
+Sailor(\underline{\emph{sid}: integer}, \emph{sname}: string,
+\emph{rating}: integer, \emph{age}: real)
+
+Boat(\underline{\emph{bid}: integer}, \emph{bname}: string,
+\emph{color}: string)
+
+Reserve(\underline{\emph{sid}: integer, \emph{bid}: integer,
+  \emph{day}: date}) \\
+
+\underline{Tables}:
+\vspace{1em}
+
+Sailor:
+\vspace{0.5em}
+
+\begin{tabular} {| l | l | l | l |}
+  \hline
+  sid & sname & rating & age\\\hline
+
+  22 & Dustin & 7 & 45.0\\
+  29 & Brutus & 1 & 33.0\\
+  31 & Lubber & 8 & 55.5\\
+  32 & Andy & 8 & 25.5\\
+  58 & Rusty & 10 & 35.0\\
+  64 & Horatio & 7 & 35.0\\
+  71 & Zorba & 10 & 16.0\\
+  74 & Horatio & 9 & 35.0\\
+  85 & Art & 3 & 25.5\\
+  95 & Bob & 3 & 63.5\\\hline
+\end{tabular}
+
+\vspace{1em}
+Boat:
+\vspace{0.5em}
+
+\begin{tabular} {| l | l | l |}
+  \hline
+  bid & bname & color \\\hline
+
+  101 & Interlake & blue\\
+  102 & Interlake & red\\
+  103 & Clipper & green\\
+  104 & Marine & red\\\hline
+\end{tabular}
+
+\vspace{1em}
+Reserve:
+\vspace{0.5em}
+
+\begin{tabular} {| l | l | l |}
+  \hline
+  sid & bid & day \\\hline
+
+  22 & 101 & 10/10/98\\
+  22 & 102 & 10/10/98\\
+  22 & 103 & 10/8/98\\
+  22 & 104 & 10/7/98\\
+  31 & 102 & 11/10/98\\
+  31 & 103 & 11/6/98\\
+  31 & 104 & 11/12/98\\
+  64 & 101 & 9/5/98\\
+  64 & 102 & 9/5/98\\
+  64 & 103 & 9/5/98\\\hline
+\end{tabular}
+
+% Enumerate through all questions.
+\begin{itemize}
+\item Q1: Find the names of sailors who have reserved boat 103.
+
+  RA1(naive way):\\
+  RA1'(Expressing RA1 with cross product):\\
+  RA2(push selection, avoid join on large tables):\\
+  RA3(push projection):
+  \begin{align*}
+    &\pi_{sname}(\sigma_{bid=103}(Reserve \bowtie Sailor))\\
+    &\pi_{sname}(\sigma_{bid=103}(\sigma_{Reserve.sid=Sailor.sid}(Reserve
+    \times Sailor)))\\
+    &\pi_{sname}((\sigma_{bid=103}Reserve) \bowtie Sailor)\\
+    &\pi_{sname}((\pi_{sid}(\sigma_{bid=103}Reserve)) \bowtie Sailor)\\
+  \end{align*}
+
+\item Q2: Find the names of sailors who have reserved a red boat.
+
+  RA1:\\
+  RA2(push projection, will generate intermediate relation instances
+  with fewer tuples):\\
+  \begin{align*}
+    &\pi_{sname}((\sigma_{color='red'}Boat) \bowtie Reserve \bowtie
+    Sailor)\\
+    &\pi_{sname}(\pi_{sid}(\pi_{bid}(\sigma_{color='red'}Boat) \bowtie Reserve) \bowtie
+    Sailor)\\
+  \end{align*}
+
+\item Q3: Find the colors of boats reserved by Lubber.
+
+  RA: 
+  \begin{align*}
+    &\pi_{color}(\sigma_{sname='Lubber'}Sailor \bowtie Reserve \bowtie Boat)
+  \end{align*}
+
+\item Q4: Find the names of sailors who have reserved at least one
+  boat.
+
+  RA:
+  \begin{align*}
+    &\pi_{sname}(Sailor \bowtie Reserve)
+  \end{align*}
+
+\item Q5: Find the names of sailors who have reserved a red or a green
+  boat.
+
+  RA:
+  \begin{align*}
+    &\pi_{sname}((\sigma_{color='red' \lor color='green'}Boat) \bowtie
+    Reserve \bowtie Sailor)
+  \end{align*}
+
+\item Q6: Find the names of sailors who have reserved a red and a
+  green boat.
+
+  RA1:
+  \begin{align*}
+    &\rho(TmpRel1, (\sigma_{color='red'}Boat) \bowtie Reserve
+    \bowtie Sailor)\\
+    &\rho(TmpRel2, (\sigma_{color='green'}Boat) \bowtie Reserve
+    \bowtie Sailor)\\
+    &\pi_{sname}(TmpRel1 \cap TmpRel2)
+  \end{align*}
+
+  RA1'(incorrect!!!):
+  \begin{align*}
+    &\rho(TmpRel1, \pi_{sname}(\sigma_{color='red'}Boat) \bowtie Reserve
+    \bowtie Sailor)\\
+    &\rho(TmpRel2, \pi_{sname}(\sigma_{color='green'}Boat) \bowtie Reserve
+    \bowtie Sailor)\\
+    &\pi_{sname}(TmpRel1 \cap TmpRel2)
+  \end{align*}
+
+  Note: since \emph{sname} is not a key for the Sailor table, RA1' is
+  incorrect. Consider the case when two persons with the same name,
+  one reserved only a red boat and another one reserved only a green
+  boat, this query will return this name.
+
+  RA2 (more efficient):
+  \begin{align*}
+    &\rho(TmpRel1, \pi_{sid}((\sigma_{color='red'}Boat) \bowtie
+    Reserve))\\
+    &\rho(TmpRel1, \pi_{sid}((\sigma_{color='green'}Boat) \bowtie
+    Reserve))\\
+    &\pi_{sname}((TmpRel1 \cap TmpRel2) \bowtie Sailor)
+  \end{align*}
+
+\item Q7: Find the names of sailors who have reserved at least two
+  boats.
+
+  RA:
+  \begin{align*}
+    &\rho(TmpReserve, \pi_{sid, sname, bid}(Sailor \bowtie Reserve))\\
+    &\rho(TmpReservePair(1 \rightarrow sid1, 2 \rightarrow sname1, 3
+    \rightarrow bid1, 4 \rightarrow sid2, 5 \rightarrow sname2, 6
+    \rightarrow bid2),\\
+    &TmpReserve \times TmpReserve)\\
+    &\pi_{sname}(\sigma_{sid1=sid2 \land bid1 \neq bid2}TmpReservePair)
+  \end{align*}
+
+\item Q8: Find the sids of sailors with age over 20 who have not
+  reserved a red boat.
+
+  RA:
+  \begin{align*}
+    \pi_{sid}(\sigma{age>20}Sailor) -
+    \pi_{sid}((\sigma_{color='red'}Boat) \bowtie Reserve \bowtie Sailor)
+  \end{align*}
+
+\item Q9: Find the names of sailors who have reserved all boats.
+
+  RA:
+  \begin{align*}
+    &\rho(TmpSid, (\pi_{sid,bid}Reserve) / (\pi_{bid}Boat))\\
+    &\pi_{sname}(TmpSid \bowtie Sailor)\\\\
+    (\pi_{sid,bid}Reserve) / (\pi_{bid}Boat) &=
+    \pi_{sid}Reserve - \pi_{sid}((\pi_{sid}Reserve) \times
+    (\pi_{bid}Boat) - \pi_{sid,bid}Reserve)
+  \end{align*}
+
+\item Q10: Find the names of sailors who have reserved all boats
+  called Interlake.
+
+  RA:
+  \begin{align*}
+    &\rho(TmpBoat, \pi_{bid}(\sigma_{bname='interlake'}Boat))\\
+    &\rho(TmpSid, (\pi_{sid,bid}Reserve) / TmpBoat)\\
+    &\pi_{sname}(TmpSid \bowtie Sailor)\\\\
+    (\pi_{sid,bid}Reserve) / TmpBoat &=
+    \pi_{sid}Reserve - \pi_{sid}((\pi_{sid}Reserve) \times
+    TmpBoat - \pi_{sid,bid}Reserve)
+  \end{align*}
+
+
+\end{itemize}
+\end{document}

@@ -1,0 +1,6 @@
+q10r1 = project (select (sale) (dname="Navigation")) (itemno)
+q10r2 = join (select (supplier) (splname="Nepalese_Corp")) (delivery) (spl#=splno)
+q10r3 = project (q10r2) (itemnum)
+q10r4 = (q10r1) intersect (q10r3)
+display q10r4
+

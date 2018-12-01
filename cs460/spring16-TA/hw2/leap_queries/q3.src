@@ -1,0 +1,2 @@
+q3r1 = (project (supplier) (splname)) product (project (department) (deptname))
+display q3r1

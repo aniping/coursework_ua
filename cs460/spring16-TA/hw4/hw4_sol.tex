@@ -1,0 +1,340 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is LaTeX file for Homework Assignment 1 of CS460
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS460}
+\def\AssignmentNo{4}
+\def\DateHandedOut{Spring, 2016}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \DateHandedOut
+
+\begin{center}
+Homework \#\AssignmentNo\\
+TA: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+
+% Enumerate through all questions.
+\begin{enumerate}
+\item 5.12 (d)\\
+  RA:
+  \begin{align*}
+    \pi_{price, type}(Room \bowtie_{Room.hotelNo=Hotel.hotelNo}
+    (\sigma_{hotelName=``Grosvenor Hotel''}(Hotel)))
+  \end{align*}
+
+  TRC:
+  \begin{align*}
+    \{R.price, R.type &| Room(R) \land (\exists H)(Hotel(H) \land
+    (R.hotelNo=H.hotelNo)\\ &\land (H.hotelName = ``Grosvenor Hotel'')) \}
+  \end{align*}
+
+  DRC:
+  \begin{align*}
+    \{price, type &| (\exists
+    roomNo,hotelNo,hotelNo1,hotelName,city)\\
+    &(Room(roomNo, hotelNo, type, price) \land Hotel(hotelNo1,
+    hotelName, city)\\
+    &\land  (hotelNo = hotelNo1) \land (hotelName = ``Grosvenor Hotel''))\}
+  \end{align*}
+
+\item 5.26\\
+  RA:
+  \begin{align*}
+    \pi_{title}(\sigma_{year=2012}(Book))
+  \end{align*}
+
+  TRC:
+  \begin{align*}
+    \{B.title | Book(B) \land B.year=2012\}
+  \end{align*}
+
+  DRC:
+  \begin{align*}
+    \{title | (\exists ISBN, edition, year) (Book(ISBN, title,
+    edition, year) \land year=2012)\}
+  \end{align*}
+  
+\item 5.28\\
+  RA:
+  \begin{align*}
+    \pi_{copyNo}(\sigma_{title=``Load of the Rings''}(Book)
+    \bowtie_{ISBN} (\sigma_{available='Y'}(BookCopy)))
+  \end{align*}
+
+  TRC:
+  \begin{align*}
+    \{BC.copyNo &| BookCopy(BC) \land (\exists B)(Book(B) \land (B.ISBN
+    = BC.ISBN)\\ &\land (BC.available='Y') \land (B.title=``Lord of the Rings''))\}
+  \end{align*}
+
+  DRC:
+  \begin{align*}
+    \{copyNo &| (\exists ISBN, title, edition, year, ISBN, available)
+    (Book(ISBN, title, edition, year)\\ &\land BookCopy(copyNo, ISBN,
+    available) \land available='Y' \land title=``Lord of the Rings'')\}
+  \end{align*}
+
+\item 6.4\\
+  An aggregate function can be used only in the SELECT list and in the
+  HAVING clause.
+
+  Apart from COUNT(*), each function eliminates nulls first and
+  operates only on the remaining non-null values. COUNT(*) counts all
+  the rows of a table, regardless of whether nulls or duplicate values
+  occur.
+
+\item 6.10\\
+  SELECT * FROM Room WHERE price $<$ 40 AND type IN ('D', 'F')
+  ORDER BY price;\\
+
+  (Note, ASC is the default setting for ORDER BY).
+
+\item 6.14\\
+  SELECT SUM(price) FROM Room WHERE type = 'D';
+
+\item 6.20\\
+  SELECT * FROM Room r\\
+  WHERE roomNo NOT IN\\
+  (SELECT roomNo FROM Booking b, Hotel h\\
+  WHERE (dateFrom $<=$ CURRENT\_DATE AND\\
+  dateTo $>=$ CURRENT\_DATE) AND\\
+  b.hotelNo = h.hotelNo AND hotelName = ``Grosvenor Hotel'');
+
+\item 6.25\\
+  SELECT MAX(X)\\
+  FROM ( SELECT type, COUNT(type) AS X\\
+  FROM Booking b, Hotel h, Room r\\
+  WHERE r.roomNo = b.roomNo AND b.hotelNo = h.hotelNo AND\\
+  city = ``London'' GROUP BY type);
+
+\item 7.7\\
+  Materialized view is a temporary table that is stored in the
+  database to represent a view, which is maintained as the base
+  table(s) are updated.\\
+
+  Advantages:\\
+  - may be faster than trying to perform view resolution.\\
+  - may also be useful for integrity checking and query optimization.
+
+\item 7.11 (b,d,f)\\
+  CREATE DOMAIN RoomPrice AS DECIMAL(5, 2)\\
+  CHECK(VALUE BETWEEN 10 AND 100);\\
+
+  CREATE TABLE Room(\\
+  \-\hspace{2em}roomNo integer NOT NULL,\\
+  \-\hspace{2em}hotelNo integer NOT NULL,\\
+  \-\hspace{2em}type char(1) NOT NULL,\\
+  \-\hspace{2em}price RoomPrice NOT NULL,\\
+  \-\hspace{2em}PRIMARY KEY (roomNo, hotelNo),\\
+  \-\hspace{2em}FOREIGN KEY (hotelNo) REFERENCES Hotel\\
+  \-\hspace{2em}ON DELETE CASCADE ON UPDATE CASCADE\\
+  );\\
+
+  CREATE TABLE Booking(\\
+  \-\hspace{2em}hotelNo integer NOT NULL,\\
+  \-\hspace{2em}guestNo integer NOT NULL,\\
+  \-\hspace{2em}dateFrom date NOT NULL,\\
+  \-\hspace{2em}dateTo date NULL,\\
+  \-\hspace{2em}roomNo integer NOT NULL,\\
+  \-\hspace{2em}PRIMARY KEY (hotelNo, guestNo, dateFrom),\\
+  \-\hspace{2em}FOREIGN KEY (hotelNo) REFERENCES Hotel\\
+  \-\hspace{2em}ON DELETE CASCADE ON UPDATE CASCADE,\\
+  \-\hspace{2em}FOREIGN KEY (guestNo) REFERENCES Guest\\
+  \-\hspace{2em}ON DELETE NO ACTION ON UPDATE CASCADE,\\
+  \-\hspace{2em}FOREIGN KEY (roomNo) REFERENCES Room\\
+  \-\hspace{2em}ON DELETE NO ACTION ON UPDATE CASCADE,\\
+  \-\hspace{2em}CONSTRAINT GuestBooked\\
+  \-\hspace{2em}CHECK (NOT EXISTS (SELECT *\\
+  \-\hspace{13.5em}FROM Booking b\\
+  \-\hspace{13.5em}WHERE b.dateTo $>$ Booking.dateFrom AND\\
+  \-\hspace{13.5em}b.dateFrom $<$ Booking.dateTo AND\\
+  \-\hspace{13.5em}b.guestNo = Booking.guestNo)));
+
+\item 7.14\\
+  CREATE VIEW BookingOutToday AS\\
+  \-\hspace{2em}SELECT g.guestNo, g.guestName, g.guestAddress,
+  r.price*(b.dateTo-b.dateFrom)\\
+  \-\hspace{2em}FROM Guest g, Booking b, Hotel h, Room r\\
+  \-\hspace{2em}WHERE g.guestNo = b.guestNo AND r.roomNo = b.roomNo AND\\
+  \-\hspace{2em}b.hotelNo = h.hotelNo AND h.hotelName = ``Grosvenor Hotel'' AND\\
+  \-\hspace{2em}b.dateTo = CURRENT\_DATE;
+
+\item 8.5\\
+  PL/SQL uses \textbf{cursors} to allow the rows of a query result to be
+  accessed one at a time. In effect, the cursor acts as a pointer to a
+  particular row of the query result. The cursor can be advanced by 1
+  to access the next row. A cursor must be declared and opened before
+  it can be used, and it must be closed to deactivate it after it is
+  no longer required. Once the cursor has been opened, the rows of the
+  query result can be retrieved one at a time using a FETCH statement,
+  as opposed to a SELECT statement.
+
+\item 8.7\\
+  The BEFORE keyword indicates that the trigger should be executed
+  before an insert is applied. It could be used to prevent a member of
+  staff from managing more than 100 properties at the same time.\\
+
+  The AFTER keyword indicates that the trigger should be executed
+  after the database table is updated. It could be used to create an
+  audit record.
+
+\item 8.8\\
+  There are two types of trigger: row-level triggers (FOR EACH ROW)
+  that execute for each row of the table that is affected by the
+  triggering event, and statement-level triggers (FOR EACH STATEMENT)
+  that execute only once even if multiple rows are affected by the
+  triggering event. An example of a row-level trigger is shown in
+  Example 8.2 where we create an AFTER row-level trigger to keep an
+  audit trail of all rows inserted into the Staff table. An example of
+  a statement-level trigger to set a new sequence number for an update
+  is seen in the middle of Figure 8.5(b).
+
+\item 8.11 (b)\\
+  CREATE TRIGGER RoomPrice\\
+  BEFORE INSERT ON Room\\
+  FOR EACH ROW\\
+  WHEN (new.type = 'D')\\
+  DECLARE vMaxSingleRoomPrice NUMBER;\\
+  BEGIN\\
+  \-\hspace{2em}SELECT MAX(price) INTO vMaxSingleRoomPrice\\
+  \-\hspace{2em}FROM Room\\
+  \-\hspace{2em}WHERE type = ‘S’;\\
+  \-\hspace{2em}IF (new.price $<$ vMaxSingleRoomPrice)\\
+  \-\hspace{4em}raise\_application\_error(-20000, ``Double room price
+  must be higher than higest single room price'' $||$ vMaxSingleRoomPrice);\\
+  \-\hspace{2em}END IF;\\
+  END;\\
+
+\item 14.4\\
+  Functional dependency describes the relationship between attributes
+  in a relation. For example, if A and B are attributes of relation R,
+  B is functionally dependent on A (denoted A $\imply$ B), if each value of A
+  in R is associated with exactly one value of B in R.
+
+  Functional dependency is a property of the meaning or semantics of
+  the attributes in a relation. The semantics indicate how the
+  attributes relate to one another and specify the functional
+  dependencies between attributes. When a functional dependency is
+  present, the dependency is specified as a constraint between the attributes.
+
+\item 14.6\\
+  Identifying all functional dependencies between a set of attributes
+  should be relatively simple if the meaning of each attribute and the
+  relationships between the attributes are well understood. This type
+  of information may be provided by the enterprise in the form of
+  discussions with users and/or appropriate documentation such as the
+  users’ requirements specification. However, if the users are
+  unavailable for consultation and/or the documentation is incomplete
+  then depending on the database application it may be necessary for
+  the database designer to use their common sense and/or experience to
+  provide the missing information.
+  As a contrast to this, consider the situation where functional
+  dependencies are to be identified in the absence of appropriate
+  information about the meaning of attributes and their
+  relationships. In this case, it may be possible to identify
+  functional dependencies if sample data is available that is a true
+  representation of all possible data values that the database may
+  hold.
+
+\item 14.7\\
+  A table in unnormalized form contains one or more repeating
+  groups. To convert to first normal form (1NF) either remove the
+  repeating group to a new relation along with a copy of the original
+  key attribute(s), or remove the repeating group by entering
+  appropriate data in the empty columns of rows containing the
+  repeating data.
+
+\item
+  Given $C \imply BDEF$ and $D \imply AG$, by the decomposition rule,
+  we know that:
+  \begin{align*}
+    C \imply B\\
+    C \imply D\\
+    C \imply E\\
+    C \imply F\\
+    D \imply A\\
+    D \imply G
+  \end{align*}
+
+  By the transitivity rule, since $C \imply D$ and $D \imply A,D
+  \imply G$, we know that:
+  \begin{align*}
+    C \imply A\\
+    C \imply G
+  \end{align*}
+
+  By relexivity rule, we know that $C \imply C$. Thus:
+  \begin{align*}
+    C^+ = ABCDEFG
+  \end{align*}
+
+  By the given set of FDs, no attribute functionally dependent on $A$
+  except itself, thus:
+  \begin{align*}
+    A^+ = A
+  \end{align*}
+
+\item 1) Put the FDs in a standard form:
+  \begin{align*}
+    &W \imply Z\\
+    &WY \imply X\\
+    &Y \imply Z\\
+    &W \imply X \text{  [decomposition rule]}\\
+    &W \imply Y \text{  [decomposition rule]}
+  \end{align*}
+  2) Minimize the left side of each FD:\\
+  we can replace $WY \imply X$ with $W \imply X$ since $W \imply Y$:
+  \begin{align*}
+    &W \imply Z\\
+    &W \imply X\\
+    &Y \imply Z\\
+    &W \imply X\\
+    &W \imply Y
+  \end{align*}
+  3) Delete redundant FDs:\\
+  one of $W \imply X$ is redundant. And $W \imply Z$ is redundant
+  because it can be inferred by $W \imply Y$ and $Y \imply Z$.
+
+  Thus, the minimal cover of $S$ is:
+  \begin{align*}
+    &W \imply X\\
+    &Y \imply Z\\
+    &W \imply Y
+  \end{align*}
+
+\end{enumerate}
+\end{document}

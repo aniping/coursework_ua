@@ -1,0 +1,7 @@
+q12r1 = project (select (department) (deptfloor="2")) (deptname)
+q12r11 = join (sale) (q12r1) (deptname=dname)
+q12r2 = project (q12r11) (itemno, dname)
+q12r3 = project (item) (item#)
+q12r4 = ((q12r3) product (q12r1)) difference (q12r2)
+q12r5 = (project (q12r2) (itemno)) difference (project (q12r4) (itemno))
+display q12r5

@@ -1,0 +1,89 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX template for grading report of CS460-Prog1
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools,enumitem,framed}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS460-Spring16}
+\def\Category{Grading Criteria}
+\def\ProgNo{3}
+\def\Grader{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \Category
+
+\begin{center}
+Grading Criteria: Prog \#\ProgNo\\
+Grader: \Grader\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+
+\section{Documentation \& Coding style (30 points)}
+
+\subsection{Documentation (20 points)}
+
+\begin{tabular}{ | l | l | l | }
+  \hline
+  & Grading criteria \\ \hline
+  External Documentation (5) & Refer to Dr. McCann's Programming Style
+  Requirements\\ \hline
+  Class Documentation (5) & Refer to Dr. McCann's Programming Style
+  Requirements \\ \hline
+  Internal Documentation (10) & Refer to Dr. McCann's Programming Style
+  Requirements \\ \hline
+\end{tabular}
+
+\subsection{Coding style (10 points)}
+
+\begin{tabular}{ | l | l | l | }
+  \hline
+  & Grading criteria \\ \hline
+  Modularity (5) & Refer to Dr. McCann's Programming Style
+  Requirements \\ \hline
+  Naming (5) & Refer to Dr. McCann's Programming Style
+  Requirements \\ \hline
+\end{tabular}
+
+\section{Implementation (70 points)}
+
+\begin{tabular}{ | l | l | l | }
+  \hline
+  & Grading criteria \\ \hline
+  table creation and data injection (15) & created successfully with
+  data injected correctly \\ \hline
+  Query-a (10) & See \tt{expected\_answers.txt} \\ \hline
+  Query-b (15) & See \tt{expected\_answers.txt} \\ \hline
+  Query-c (15) & See \tt{expected\_answers.txt} \\ \hline
+  Query-d (15) & Fullfill the requirement \\ \hline
+\end{tabular}
+
+\end{document}

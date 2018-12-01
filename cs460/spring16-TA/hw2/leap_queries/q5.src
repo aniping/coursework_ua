@@ -1,0 +1,4 @@
+q5r1 = join (department) (sale) (deptname=dname)
+q5r2 = project (select (q5r1) (deptfloor="2")) (itemno)
+display q5r2
+

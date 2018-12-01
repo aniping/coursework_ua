@@ -1,0 +1,8 @@
+q11r1 = join (department) (select (employee) (empfname="Andrew")) (empno = emp#)
+q11r2 = join (sale) (select (item) (itemname="Pith_helmet")) (itemno = item#)
+q11r3 = join (q11r1) (q11r2) (dname=deptname)
+q11r4 = join (delivery) (select (item) (itemname="Pith_helmet")) (itemnum = item#)
+q11r5 = join (q11r4) (supplier) (splno = spl#)
+q11r6 = join(q11r5) (q11r3) (dptname=deptname)
+q11r7 = project (q11r6) (splname)
+display q11r7

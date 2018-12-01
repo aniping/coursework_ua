@@ -1,0 +1,147 @@
+<HTML>
+<head>
+    <title>CSc 560 Term Project 4: Sort-Merge Join Assignment</title>
+</head>
+
+<body>
+<h1><center><font color = "blue">Spring 2017</font></center></h1>
+<h1><center><font color = "blue">CSc 560: Database Systems Implementation</font></center></h1>
+<h2><center><font color = "blue">Project 4: Sort-Merge Join</font></center></h2>
+<h3><center><U><font color = "blue">Due: 05/04/2017 (Thursday) at 11:59pm</U></font></center></h3>
+<br><br>
+
+<div class="MsoNormal"><h2><b><font color="#3333FF">Introduction</font></b></h2></div>
+In this assignment, you will implement the <i>sort-merge</i> join algorithm. Note that the sorting implementation is given, so you only need to implement the merge step, on the sorted files.
+
+<div class="MsoNormal"><h2><b><font color="#3333FF">Available Documentation</font></b></h2></div>
+You should begin by reading the chapter on <i>Implementation of Relational Operations</i>, in particular, the section on the sort-merge join.
+
+<div class="MsoNormal"><h2><b><font color="#3333FF">What You Have to Implement</font></b></h2></div>
+
+<pre>
+class sortMerge {
+  public:
+     sortMerge(
+	char*		filename1,   	// Name of heapfile for relation R
+	int             len_in1,        // # of columns in R.
+	AttrType        in1[],          // Array containing field types of R.
+	short           t1_str_sizes[], // Array containing size of columns in R
+	int             join_col_in1,   // The join column of R 
+
+	char*   	filename2,     	// Name of heapfile for relation S
+	int             len_in2,        // # of columns in S.
+	AttrType        in2[],          // Array containing field types of S.
+	short           t2_str_sizes[], // Array containing size of columns in S
+	int             join_col_in2,   // The join column of S
+
+	char*           filename3,      // Name of heapfile for merged results
+	int             amt_of_mem,     // Number of pages available
+	TupleOrder      order,          // Sorting order: Ascending or Descending
+	Status&         s               // Status of constructor
+     );
+
+     ~sortMerge();
+}
+</pre>
+
+<p>
+The <tt>sortMerge</tt> constructor joins two relations <b>R</b> and <b>S</b>, 
+represented by the heapfiles <tt>filename1</tt> and <tt>filename2</tt>, respectively, 
+using the sort-merge join algorithm. 
+Note that the columns for relation R (S) are numbered from 0 to <i>len_in1 - 1</i> 
+(<i>len_in2 - 1</i>). 
+You are to concatenate each matching pair of records and write it 
+into the heapfile <tt>filename3</tt>. 
+The error layer for the <tt>sortMerge</tt> class is <tt>JOINS</tt>.
+</p>
+
+<p>You will need to use the following classes which are given: <tt>BufMgr</tt>, <tt>HeapFile</tt>, <tt>HFPage</tt>, <tt>Sort</tt>, and <tt>Scan</tt>. 
+You can use your own <tt>HeapFile</tt>, <tt>HFPage</tt>, <tt>Scan</tt>, and <tt>BufMgr</tt> classes implemented in <a href="../proj1/proj1.html">project 1</a> and <a href="../proj2/proj2.html">project 2</a>, respectively. (You will not need the B-Tree classes implemented in <a href="../proj3/proj3.html">project 3</a>.) 
+You will be given the implentation of the external sort algorithm in the file <tt>sort.o</tt>.
+</p>
+
+<p>
+You will call the <tt>Sort</tt> constructor to sort the input heapfiles 
+(which means your primary responsibility will be to implement the merging phase of the algorithm). 
+To compare the join columns of two tuples, you will call the function <tt>tupleCmp</tt> (declared in <tt><a href="sort.h">sort.h</a></tt> and implemented in <tt>sort.o</tt>).
+Once a scan is opened on a heapfile, the scan cursor can be positioned to any record within the heapfile calling the <tt>Scan</tt> method <tt>position</tt> with an <tt>RID</tt> argument. 
+The next call to the <tt>Scan</tt> method <tt>getNext</tt> will proceed from the new cursor position.
+</p>
+
+<div class="MsoNormal"><h2><b><font color="#3333FF">Getting Started</font></b></h2></div>
+<P>
+Download the zip file (<a href="cs560-proj4.tar.gz"><tt>cs560-proj4.tar.gz</tt></a>) for <a href="proj4.html">project 4</a> and unzip it (e.g., <TT>tar xvfz cs560-proj4.tar.gz</TT>) into your working directory (<tt>~/</tt>). 
+
+</P>
+
+<P>
+The major files in <tt>~/proj4/SortMerge/include</tt> are:
+<UL>
+<li><tt>sort.h</tt>: Specifications for the class <tt>Sort</tt> (external sort implementation).</li>
+<li><tt>sortMerge.h</tt>: Specifications for the class <tt>sortMerge</tt>. You have to implement these specifications in <TT>sort.c</TT>.</li>
+<li><tt>db.h</tt>, <tt>buf.h</tt>, <tt>heapfile.h</tt>, <tt>hfpage.h</tt>, and <tt>scan.h</tt>: Header files used in the previous projects.</li>
+</UL>
+</P>
+
+<P>
+The major file in <tt>~/proj4/SortMerge/lib</tt> is:
+<UL>
+<li><tt>libdb.a</tt>: <tt>DB</tt> library used in the previous projects.</li>
+</UL>
+</P>
+
+<P>
+The major files in <tt>~/proj4/SortMerge/src</tt> are:
+<UL>
+<LI><tt>README</tt>: Description of the files used in this project.
+<LI><tt>Makefile</tt>: A sample <tt>Makefile</tt> for you to compile your project. Set up any dependencies (as needed) by editing this file.
+<LI><tt>heapfile.C</tt>, <tt>hfpage.C</tt>, <tt>scan.C</tt>, and <tt>buf.C</tt>: Source code for the <tt>HeapFile</tt>, <tt>HFPage</tt>, <tt>Scan</tt>, and <tt>BufMgr</tt> classes. These source code should be replaced by your own code used in <a href="../proj1/proj1.html">project 1</a> and <a href="../proj2/proj2.html">project 2</a>. You need to implement <TT>Scan::mvNext(RID&amp; rid)</TT> and <TT>Scan::position(RID rid)</tt>, which were not required in <a href="../proj1/proj1.html">project 1</a>.</LI>
+<LI><tt>sortMerge.C</tt>: The <tt>sortMerge</tt> class. You need to implement this.</LI>
+<LI><tt>sort.o</tt>: The <tt>Sort</tt> class implementation. 
+<LI><tt>SMJTester.C</tt>: Sort-merge test driver program. 
+<LI><tt>expected_output</tt>: Correct test output.
+</UL>
+</P>
+
+<P>
+For more details, see <tt>README</tt> in <tt>~/proj4/SortMerge/src</tt>.
+</P>
+
+<div class="MsoNormal"><h2><b><font color="#3333FF">Additional Notes</font></b></h2></div>
+<p>
+<ul><h3><b><font color="#3333FF">A Note on Code Comments</font></b></h3>
+<li>
+You are responsible for making your implementation understandable to other programmers, in particular the grader. 
+If there is anything about your implementation that would not be apparent at first glance, you may wish to provide additional documentation of it.
+</li>
+</ul>
+<ul><h3><b><font color="#3333FF">A Note on Plagiarism</font></b></h3>
+<li>Never make any attempt to search on the web for any source code related to this sort-merge operator. The sort-merge layer for <a href="../proj4/proj4.html">project 4</a> should be your own implementation.
+<li>We will be running plagiarism-checking software against each group's code as before. We will compare each group's submission against all other groups. Don't copy someone else's code!</li>
+</ul>
+</p>
+
+<p>
+<div class="MsoNormal"><h2><b><font color="#3333FF">What to Turn In</font></b></h2></div>
+
+<p>You are required to turn in your copy of all source files in the handin directory. 
+This includes all the files needed to make and run your executable &#8212; <u><tt>SortMerge</tt></u> &#8212; in <tt>~/proj4/SortMerge/src</tt>. 
+We should be able to go to your handin directory, and type <tt>make</tt> and run the program (<u><tt>SortMerge</tt></u>) in <tt>~/proj4/SortMerge/src</tt>. 
+</p>
+
+<br>
+<p>Once you have finished your project, please tar your directory (i.e., <TT>proj4.tar</TT>) and email to Mina minakazemimanesh@email.arizona.edu the tar file.
+<br>
+ 
+<p>Please remember late submissions will not be accepted. Make sure to start early! 
+</UL>
+    <hr>
+<!--    Grader: <a href="mailto:yksuh@cs.arizona.edu">Young-K. Suh</a><br> -->
+	<script language="JavaScript">
+	<!-- Hide JavaScript...
+	var LastUpdated = document.lastModified;
+	document.writeln ("This page was last updated " + LastUpdated);
+	// End Hiding -->
+	</script>
+  </body>
+</html>

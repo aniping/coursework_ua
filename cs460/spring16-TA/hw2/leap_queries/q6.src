@@ -1,0 +1,4 @@
+q6r1 = join (item) (sale) (item#=itemno)
+q6r2 = join (q6r1) (department) (dname=deptname)
+q6r3 = project (q6r2) (itemno, itemtype, dname, deptfloor)
+display q6r3

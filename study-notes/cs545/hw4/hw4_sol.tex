@@ -1,0 +1,451 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is LaTeX file for Homework Assignment 4
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS545}
+\def\AssignmentNo{4}
+\def\DateHandedOut{Spring, 2015}
+\def\DateDue{April 16}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \DateHandedOut
+
+\begin{center}
+Homework Assignment \#\AssignmentNo\\
+Due: \DateDue\\
+Student: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+
+% Enumerate through all questions.
+\begin{enumerate}
+
+\item % Problem 1
+
+Let two stacks be $S_{rear}$ and $S_{front}$ where $S_{rear}$ is used
+for putting elements to the rear of queue $Q$ and $S_{front}$ is used for
+removing elements on the front of queue $Q$. To implement $Put(x, Q)$, we
+just push $x$ to $S_{rear}$ such that the tail of queue would be on
+top of $S_{rear}$. To implement $Get(Q)$, we pop element
+from $S_{front}$, if $S_{front}$ is empty but $S_{rear}$ is not empty,
+we first pop every element off $S_{rear}$ and push them to
+$S_{front}$ such that the front of queue would be on top of the
+$S_{front}$, then do the pop. 
+
+\underline{Pseudo code}
+
+\textbf{Function} $Put(x,Q)$\\
+\-\hspace{2em} $push(x, S_{rear})$\\
+
+\textbf{Function} $Get(Q)$\\
+\-\hspace{2em} \textbf{if} $S_{front}$ is not empty\\
+\-\hspace{4em} \textbf{return} $pop(S_{front})$\\
+\-\hspace{2em} \textbf{else if} $S_{rear}$ is not empty\\
+\-\hspace{4em} \textbf{while} $S_{rear}$ is not empty\\
+\-\hspace{6em} $x = pop(S_{rear})$\\
+\-\hspace{6em} $push(x, S_{front})$\\
+\-\hspace{4em} \textbf{return} $pop(S_{front})$\\
+\-\hspace{2em} \textbf{else}\\
+\-\hspace{4em} \textbf{print} ``Empty Queue''\\
+
+\underline{Amortized Analysis}
+
+We will use the number of basic push and pop to measure cost.
+
+For each $i=1,2,\cdots,n$, let $a_i$ be the amortized cost of the
+$i$th operation, $t_i$ be the actual cost for $i$th operation, and
+$D_i$ be the data structure that results after applying the $i$th
+operation to data structure $D_{i-1}$. We start with $D_0$ which is an
+empty queue.
+
+Let the number of elements in the stack $S_{rear}$ be $s$. 
+We define the potential function $\Phi$ be $2s$. For the empty queue
+$D_0$ with which we start, we have $\Phi(D_0) = 0$. Since the number
+of elements in the stack is never negative, the queue $D_i$ that
+results after the $i_{th}$ operation has non-negative potential, thus,
+\begin{align}
+  \Phi(D_i) &\geq 0\\
+  &= \Phi(D_0)
+\end{align}
+The total amortized cost of $n$ operations with respect to $\Phi$
+therefore represents an upper bound on the actual cost. 
+
+Suppose the $i$th operation on a queue with $s$ elements in the stack
+$S_{rear}$ is $Put$, then the amortized cost is:
+\begin{align}
+  a_i &= t_i + \Phi(D_i) - \Phi(D_{i-1})\\
+  &= 1 + 2(s+1) - 2s\\
+  &= 1 + 2\\
+  &= 3
+\end{align}
+$t_i$ is 1 because $Put$ only took 1 basic push. Potential before the
+operation is $2s$ and potential after the operation is $2(s+1)$ since
+the size of the stack $S_{rear}$ grows by 1. Thus the change of
+potential is 2.
+
+If it is a $Get$ operation, there are two cases to consider:
+\begin{enumerate}
+\item stack $S_{front}$ is not empty, then the amortized cost is:
+  \begin{align}
+    a_i &= t_i + \Phi(D_i) - \Phi(D_{i-1})\\
+    &= 1 + 2s - 2s\\
+    &= 1 + 0\\
+    &= 1
+  \end{align}
+  Again, $Get$ in this case only took 1 basic pop, so $t_i$ is 1. The
+  potential didn't change since the size of stack $S_{rear}$ didn't
+  change. 
+\item stack $S_{front}$ is empty, then the amortized cost is:
+  \begin{align}
+    a_i &= t_i + \Phi(D_i) - \Phi(D_{i-1})\\
+    &= (s+s+1) + 0 - 2s\\
+    &= 2s + 1 - 2s\\
+    &= 1
+  \end{align}
+  In this case, $Get$ operation took $s$ basic pop and $s$ basic push
+  to remove all elements in $S_{rear}$ into $S_{front}$, and 1 basic
+  pop to get the element on the front of queue. Since after the
+  operation, $S_{rear}$ would be empty, thus the change of potential
+  is $-2s$.
+\end{enumerate}
+
+The amortized cost for each of the two operations is $O(1)$, and thus
+of total cost of a sequence of $n$ operations is $O(n)$. Since we've
+already shown that the total amortized cost of $n$ operations is an
+upper bound on the total actual cost. The worst-case cost of $n$
+operations is therefore $O(n)$. 
+
+\item % problem 2
+  We will use an unsorted array $A$ to implement these two
+  operations. Let $n$ be the size of $A$. Initially, $n=0$.
+
+\underline{Pseudo code}
+
+\textbf{Function} $Insert(x,S)$\\
+\-\hspace{2em} $n := n + 1$\\
+\-\hspace{2em} $A[n] := x$\\
+
+\textbf{Function} $DeleteLargerHalf(S)$\\
+\-\hspace{2em} use the worst-case linear time selection algorithm to
+find the median of $A$.\\
+\-\hspace{2em} partition the array $A$ around the median.\\
+\-\hspace{2em} remove the elements from the larger half of the
+partitioned array $A$.\\
+\-\hspace{2em} $n := n - \ceil{n/2}$ // reset the size of $A$\\
+
+$Insert$ takes constant time while $DeleteLargerHalf$ takes $O(n)$
+time since finding the median takes linear time, and so do
+partitioning the array and removing elements from the larger half. 
+
+\underline{Amortized Analysis}
+
+We will use the number of basic operations (operations that take constant amount
+of time) to measure the cost such that the run time would be $\Theta$
+of the number of basic operations. Since $Insert$ takes two basic
+operations (incrementing $n$ and assigning $x$ to $A[n]$), its actual
+cost would be 2. Since $DeleteLargerHalf$ takes $O(n)$ time, let its
+actual cost be at most $cn$ where $c$ is some positive constant. 
+
+The following table shows the real time and amortized time for each
+operation. 
+
+\begin{tabular}{ l l l  }
+  operation & actual cost $t_i$ & amortized cost $a_i$ \\ \hline
+  $Insert$ & 2 & 2+2$c$ \\
+  $DeleteLargerHalf$ & $cn$ & 0
+\end{tabular}
+
+For $Insert$, we use 2 unit out of 2+2$c$ units to pay the actual cost and
+store the remaining 2$c$ units as credit for each inserted element. For
+$DeleteLargerHalf$, we use $c$ unit of credit stored on each element to pay for
+the actual cost. This leaves $c$ unit of credit on each element after finding
+the median and partitioning the array. When deleting the larger half,
+we redistribute the $c$ unit of credit stored on each deleted element to the
+remaining elements. Thus, there are always 2$c$ unit of credit stored on each
+element so we can pay for future $DeleteLargerHalf$ operations.
+
+Since each element in the array has 2$c$ unit of credit on it, and the
+size of array is always non-negative, we have ensured that the amount
+of credit is always non-negative. Thus, for any sequence of $n$
+$Insert$ and $DeleteLargerHalf$ operations, the total amortized cost
+is an upper bound on the total actual cost. 
+
+\item % problem 3
+  Let $D_i$ be the heap with $n_i$ elements after the $i$th
+  operation. Since both $Extract$ and $Insert$ take $O(\lg n)$ time,
+  let $k$ be some positive constant such that both operations take at most
+  $k\lg n$, where $n = max(n_i, n_{i-1}$. So now we can use $k\lg n$
+  to measure the real time of each operation.
+
+  We define the potential function be:
+  \begin{align}
+    \Phi(D_i) &= \sum_{x \in D_i} (1 + k \cdot depth_i(x))\\
+    &= n_i + k\sum_{x \in D_i} depth_i(x)
+  \end{align}
+  where $depth_i(x)$ is the depth (the number of edges from the root
+  to the node) of element $x$ in $D_i$.
+
+  Initially, the heap is empty, so $\Phi(D_0) = 0$. And since $k$ is
+  postive and $depth_i(x)$ is non-negative, we always have $\Phi(D_i)
+  \geq 0$. 
+
+  Suppose the $i$th operation is $Extract$, the change of potential is:
+  \begin{align}
+    \Delta\Phi &= \Phi(D_i) - \Phi(D_{i-1})\\
+    &= (n_i + k\sum_{x \in D_i} depth_i(x)) - (n_{i-1} + k\sum_{x \in
+      D_{i-1}} depth_{i-1}(x)) \\
+    &= (n_i - n_{i-1}) + k(\sum_{x \in D_i}depth_i(x) - \sum_{x \in
+      D_{i-1}}depth_{i-1}(x))\\
+    &= -1 + k(-\lg n_{i-1})\\
+    &= -1 - k\lg n_{i-1}
+  \end{align}
+  since the size of heap after $Extract$ drops by 1 and the sum of
+  depth of all elements in $D_i$ drops by the depth of the last
+  element in $D_{i-1}$, which is $\lg n_{i-1}$, so the potential
+  decreases by $(1 + k\lg n_{i-1})$. 
+  
+  So, the amortized time for $Extract$ is:
+  \begin{align}
+    a_i &= t_i + \Delta\Phi\\
+    &\leq k\lg n_{i-1} + (-1 - k\lg n_{i-1})\\
+    &\leq k\lg n_{i-1} -1 - k\lg n_{i-1}\\
+    &\leq -1\\
+    &= O(1)
+  \end{align}
+  since the actual time takes for $Extract$ is at most $k\lg n_{i-1}$
+  because $n_{i-1} > n_i$, thus the amortized time is $O(1)$.
+
+  Suppose the $i$th operation is $Insert$, the change of potential is:
+  \begin{align}
+    \Delta\Phi &= \Phi(D_i) - \Phi(D_{i-1})\\
+    &= (n_i + k\sum_{x \in D_i} depth_i(x)) - (n_{i-1} + k\sum_{x \in
+      D_{i-1}} depth_{i-1}(x)) \\
+    &= (n_i - n_{i-1}) + k(\sum_{x \in D_i}depth_i(x) - \sum_{x \in
+      D_{i-1}}depth_{i-1}(x))\\
+    &= 1 + k\lg n_i
+  \end{align}
+  since the size of heap after $Insert$ increases by 1 and the sum of
+  depth of all elements in $D_i$ increases by the depth of the last
+  element in $D_i$, which is $\lg n_i$, so the potential
+  increases by $(1 + k\lg n_i)$.
+  
+  So, the amortized time for $Insert$ is:
+  \begin{align}
+    a_i &= t_i + \Delta\Phi\\
+    &\leq k\lg n_i + (1 + k\lg n_i)\\
+    &\leq 1 + 2k\lg n_i\\
+    &= O(\lg n)
+  \end{align}
+  since the actual time takes for $Insert$ is at most $k\lg n_i$
+  because $n_i > n_{i-1}$, thus the amortized time is $O(\lg n)$.
+
+\item % problem 4
+  \begin{enumerate}
+  \item 
+    We can implement $Find$ by doing binary search on each array in
+    $D$ that is \emph{full} since individual arrays are sorted.
+
+    \underline{Pseudo code}
+
+    \textbf{Function} $Find(k,D)$\\
+    \-\hspace{2em} \textbf{for} $i := 1$ to $\ceil{\lg (n+1)}$\\
+    \-\hspace{4em} \textbf{if} bit $i$ is 1 in binary representation
+    of $n$: // $A_i$ is full\\
+    \-\hspace{6em} search key $k$ in $A_i$ using binary search.\\
+    \-\hspace{6em} if $k$ is found, return the item $x$ associated
+    with it;\\ 
+    \-\hspace{6em} otherwise continue to the next array.\\
+
+  The worst case for $Find$ is when all arrays $A_1, \cdots, A_l$ are
+  full, where $l=\ceil{\lg (n+1)}$, then the total time taken is:
+  \begin{align}
+    T(n) &= \Theta(\sum_{i=1}^{l} \log (2^{i-1}))\\
+    &= \Theta(\sum_{i=1}^{l} (i-1))\\
+    &= \Theta(\frac{l(l-1)}{2})\\
+    &= \Theta(l^2)\\
+    &= \Theta(\ceil{\lg (n+1)}^2)\\
+    &= \Theta((\log(n))^2)
+  \end{align}
+  Thus worst-case time for $Find$ is also $O((\log(n))^2)$.
+
+\item % part-b
+  To implement $Insert$, we first create a new sorted array $B_1$ with
+  size of 1 that contains the element $(k,x)$ to be inserted. Then we
+  check to see if $A_1$ is empty, if it is, just replace $A_1$ with
+  $B_1$, otherwise we merge sort $A_1$ and $B_1$ into a new sorted array
+  $B_2$. Then check if $A_2$ is empty, if it is, just replace $A_2$
+  with $B_2$, otherwise we merge sort $A_2$ and $B_2$ and continue to
+  check the emptiness of $A_3$ until we find a empty array to
+  replaced. Notice that $A_i$ is of size $2^{i-1}$ and merging $A_i$ with
+  another array of the same size results in a new array of size
+  $2^{i}$ which is $A_{i+1}$.
+
+  %% \underline{Pseudo code}
+
+  %% \textbf{Function} $Insert(k,x,D)$\\
+  %% \-\hspace{2em} create a new sorted array $B$ of size 1 that contains $(k,x)$\\
+  %% \-\hspace{2em} \textbf{for} $i := 1$ to $\ceil{\lg (n+2)}$\\
+  %% \-\hspace{4em} \textbf{if} $A_i$ is empty\\
+  %% \-\hspace{6em} replace $A_i$ with $C$\\
+  %% \-\hspace{4em} \textbf{if} $A_i$ is full\\
+  %% \-\hspace{6em} replace $A_i$ with $C$\\
+
+Assume that merge 2 sorted arrays of the same size $m$ into one sorted
+array takes $2m$ time.
+The worst-case time for $Insert$ is when array $A_1,\cdots,A_{l-1}$ are
+all full so we have to merge sort all of them with $B$ into
+$A_l$. This takes:
+  \begin{align}
+    T(n) &= 2(\sum_{i=1}^{l-1} 2^{i-1})\\
+    &= 2(2^{l-1} - 1)\\
+    &= 2^l - 2\\
+    &= 2^{\ceil{\lg (n+1)}} - 2\\
+    &= \Theta(n)
+  \end{align}
+  Thus the worst-case time for $Insert$ is $\Theta(n)$.
+
+  \underline{Amortized Analysis}
+  
+  We will the aggregation method to compute the total cost for a
+  sequence of $n$ $Insert$ operations, starting with the empty data
+  structure $D_0$. For $D_i$ with $n$ elements, let the binary
+  representation of $n$ be $n_k, n_{k-1}, \cdots, n_1$ and let $j$ be
+  the position of the right most 0 bit in $n_k, n_{k-1}, \cdots, n_1$
+  such that $n_{j-1}, \cdots, n_1$ are all 1s. Therefore, the cost of
+  inserting the $(n+1)$th element would be:
+  \begin{align}
+    T(n) &= 2(\sum_{i=1}^{j-1} 2^{i-1})\\
+    &= 2(2^{j-1} - 1)\\
+    &= 2^j - 2\\
+    &= O(2^j)
+  \end{align}
+  And we have $j=1$ for half time since each time $n$ increases, its
+  the $1$st bit will flip, and half of them is flip from 0 to 1, and
+  $j=2$ for a quarter of time, and so on. So there are at most
+  $\ceil{n/2^{j-1}}$ insertions for each value of $j$. Thus the total
+  cost of $n$ operations is:
+  \begin{align}
+    O(\sum_{j=1}^{\ceil{\lg (n+1)}} \ceil{n/2^{j-1}} 2^j ) = O(n\log n)
+  \end{align}
+  Therefore the amortized cost for each of $Insert$ operation $O(\log n)$.
+  \end{enumerate}
+
+\item % problem 5
+\begin{enumerate}
+\item % part-a
+  Suppose $T$ is a $n$-node binary search tree rooted at node $r$. To
+  make it $1/2$ balanced, we first do an in-order traverse starting
+  at the root $r$ and output all $n$ elements in an array $A$. Since
+  $T$ is a binary search tree, elements in $A$ will be sorted. This
+  requires $\Theta(n)$ space and time. Then we pick the median of
+  array $A$ and use it as the root to rebuild the tree. This
+  guarantees that the new tree is $1/2$ balanced. Rebuilding a tree is
+  a recursive process and the recurrence equation for the run time is
+  $T(n) = 2T(n/2) + 1 = \Theta(n)$. And the extra space needed for the
+  new tree is also $\Theta(n)$. Thus $T$ can be made $1/2$ balanced in
+  $\Theta(n)$ time and $\Theta(n)$ space.
+
+\item % part-b
+  We perform a $Find$ operation starting at the root recursively to
+  subtrees, the worst case is when we split in a subtree with $m$
+  nodes and recurse on its subtree with $\alpha m$ nodes since the
+  number of nodes in a subtree is bounded by $\alpha$. So the
+  recurrence equation is:
+  \begin{align}
+    T(n) &\leq T(\alpha n) + 1\\
+    &= O(\log_{1/\alpha}n)\\
+    &=O(\log n)
+  \end{align}
+
+\item % part-c
+First, we prove that for a $1/2$-balanced tree, $d(x) < 2$ for all
+node $x$ in the tree.
+\begin{proof}
+  Prove by contradiction. Assume that for some node $x$, $d(x) \geq
+  2$, then without loss of generality, assume that the left subtree is
+  bigger, then we have $s(l(x)) - s(r(x)) \geq 2$. Further, we know
+  that the sum of size of left subtree and size of right subtree must
+  be $s(x)-1$:
+  \begin{align}
+    s(l(x)) + s(r(x)) + 1 &= s(x)
+  \end{align}
+  Replacing $s(r(x))$ with $s(x)-s(l(x))-1$, we have:
+  \begin{align}
+    s(l(x)) - (s(x)-s(l(x))-1) &\geq 2\\
+    s(l(x)) - s(x) + s(l(x)) + 1 &\geq 2\\
+    2s(l(x)) &\geq s(x) + 1\\
+    s(l(x)) &\geq \frac{1}{2}s(x) + 1/2
+  \end{align}
+  But this contradicts to the fact that the tree is $1/2$-balanced.
+\end{proof}
+Therefore, after rebalancing, the potential $\Phi(T)=0$ since no node
+$x$ exists such that $d(x) \geq 2$.
+
+Suppose after $Insert$ or $Delete$, node $x$ is the highest node that
+is not $\alpha$-balanced and the subtree rooted at $x$ is of size
+$m$. Without loss of generality, assume that the left subtree is
+bigger, then we must have $s(l(x)) > \alpha m$. Since $s(l(x)) +
+s(r(x)) + 1 = s(x) = m$, we have $s(r(x)) = m - 1 - s(l(x)) <
+m-1-\alpha m = (1-\alpha)m - 1$. Therefore,
+\begin{align}
+  d(x) &= s(l(x)) - s(r(x))\\
+  &> \alpha m - ((1-\alpha)m - 1)\\
+  &= (2\alpha - 1)m + 1
+\end{align}
+Thus we can bound the total potential before rebalancing the tree as:
+\begin{align}
+  \Phi(T) &> \frac{1}{2\alpha - 1} ((2\alpha - 1)m + 1)\\
+  &= m + \frac{1}{2\alpha - 1}
+\end{align}
+Since the potential after rebalancing the tree is 0, thus the change
+of potential is $-m - \frac{1}{2\alpha - 1}$. Since the actual cost
+for rebalancing is $m$, therefore the amortized cost is $O(1)$.
+
+\item % part-d
+  Since $Find$ takes $O(\log n)$ worst-case time for a
+  $\alpha$-balanced tree, $Insert$ or $Delete$ also takes $O(\log n)$
+  worst-case time. Further, when we insert or delete a node $x$, we
+  can only change the nodes that are on the path from the node $x$ to
+  the root. For $Insert$, the worst case would be we increase $d(i)$
+  for each node $i$ in the path by 1, and there are $O(\log n)$ such
+  nodes. Therefore the potential could increase by $\frac{1}{2\alpha -
+    1}O(\log n) = O(\log n)$. Thus, the amortized cost would be the
+  actual cost plus the change of potential: $O(\log n) + O(\log n) =
+  O(\log n)$.
+
+\end{enumerate}
+
+\end{enumerate}
+\end{document}

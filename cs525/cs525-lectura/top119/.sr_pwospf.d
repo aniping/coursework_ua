@@ -1,0 +1,2 @@
+sr_pwospf.o: sr_pwospf.c sr_if.h sr_pwospf.h pwospf_protocol.h \
+ sr_router.h sr_protocol.h sr_arp.h vnlconn.h sr_utils.h sr_rt.h

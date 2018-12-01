@@ -1,0 +1,104 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX template for reading report
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools,enumitem}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS525}
+\def\ReportNo{14}
+\def\Category{Reading Report}
+\def\PaperTitle{Clustering and Sharing Incentives in BitTorrent
+  Systems}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \Category
+
+\begin{center}
+Reading Report \#\ReportNo\\
+Paper: \PaperTitle\\
+Student: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+\vspace{1.5em}
+This work is an experimental investigation on BitTorrent protocol
+properties: the clustering of similar-bandwidth peers, the
+effectiveness of BitTorrent's sharing incentives, and the peers' high
+uplink utilization. It helps us to better understand BitTorrent
+protocol. Based on this work, we can do some followup work on
+BitTorrent protocol. We will look at three aspects: performance,
+fair sharing and BitTorrent for streaming.
+
+\begin{enumerate}
+\item \emph{performance} \\
+  One way to improve performance is to explore BitTorrent
+  locality. BitTorrent ignores traffic costs at ISPs and generates a
+  lot of cross-ISP traffic. This is not desirable. We need to improve
+  BitTorrent to enhance its traffic locality,
+  trying to push traffic within an ISP and to minimize traffic across
+  ISPs. Peers in BitTorrent select their neighbors complete
+  randomly. This is the root cause of cross-ISP traffic. If we can
+  make a peer select most of its neighbors within the same ISP, then
+  we can reduce cross-ISP traffic and lead to better performance. To
+  achieve this, BitTorrent needs to be aware of the underlying
+  topology at the ISP level, this definitely complicates the
+  protocol. Another way to improve performance is to encourage nodes
+  to stay as seeds for a longer time. Current BitTorrent lacks incentives for nodes to
+  stay as seeds. If nodes can stay around as seeds after finish
+  downloading, it can help newly joined nodes catch up faster. Due to
+  lack of data pieces they can offer to other nodes, newly joined nodes
+  usually need longer time to reach to a fast and stable download
+  rate. They usually receives data pieces from optimistic unchoking of other
+  leechers as well as from seeds. Therefore having a large number of
+  seeds available can allow them ramp up faster. The question of how to
+  encourage nodes to stay as seeds remains open-ended.
+
+\item \emph{fair sharing} \\
+  BitTorrent has the problem of potentially
+  having peers who consume more than their fair share of the network
+  resources, the so-called free-riders. We need a way to correctly
+  identify free-riders and how to adjust the policy to penalize
+  free-riders and reward non-free-riders. We can also do some work to
+  investigate how these free-riders impact the system performance.
+
+\item \emph{BitTorrent for streaming} \\
+  Though not originally designed for streaming, BitTorrent can be
+  potentially used for streaming. Changes are needed for BitTorrent to
+  be suitable for streaming. The challenge is to meet the sequential
+  playback demands of media streaming applications. 
+  One major thing is piece selection: we
+  need better selection policy to satisfy streaming.
+\end{enumerate}
+
+\vspace{1em}
+
+\end{document}

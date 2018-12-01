@@ -1,0 +1,107 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX template for reading report
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools,enumitem}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS525}
+\def\ReportNo{10}
+\def\Category{Reading Report}
+\def\PaperTitle{Congestion Control for High Bandwidth-Delay Product
+  Networks}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \Category
+
+\begin{center}
+Reading Report \#\ReportNo\\
+Paper: \PaperTitle\\
+Student: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+\vspace{1.5em}
+
+XCP is designed to improve traditionally TCP congestion control
+methods, the goal is still the same: to maximum network bandwidth
+utilization while ensuring the fairness among flows. The design is
+still focused on network itself. If we take a look at the metrics it
+used for measuring the effectiveness of XCP: \emph{average link
+  utilization}, \emph{average queue size} and \emph{number of packet
+  drops} for efficiency and \emph{average throughput per flow} for
+fairness, we will notice that these metrics are all
+network-centric. But how about the end-user experience? Do they really
+feel like they get good services when XCP is in use?
+
+\vspace{1em}
+All the benefits XCP brought in also came with a prices. Because of
+the ignore of the end-user experience, XCP does not perform well in
+any cases. For example, for long-lived flows, XCP performs very well,
+being able to achieve high bandwidth utilization, small queue size,
+low packet drops and fair bandwidth share among flows. However, the
+Internet is a dynamic environment, therefore we always see flows with
+different length. Especially, as the long-tail distribution suggested:
+there are more short-lived flows and fewer long-lived flows. Under
+such condition, will all the performance benefits envisioned by XCP
+still hold? 
+
+\vspace{1em}
+With a mix of flows of different length, XCP does not perform
+well for short flows. In XCP, when there are available bandwidths,
+its fairness controller will divide it evenly among flows. This seems
+not fair to those short-lived flows because it is possible that they
+could have finished within one or few RTTs, but because of the way
+XCP's fairness controller works, they still get very little bandwidth
+increase for each round trip. This could stretch their duration to
+many RTTs, which is definitely not desirable. From end-user point of
+view, they might experience relative long service delay than they
+should. Things get worse when several long-lived flows keep the
+link occupied, when new short flows come in, they will get very little
+share of bandwidth, though they will gain bandwidth gradually, since
+they are short flows, they may have finished before they enter
+fair-share state. Thus XCP leads to long flow duration for those short
+flows, this will negatively impact end-user experience of
+services through the Internet.
+
+\vspace{1em}
+The way XCP controls fairness may be a bit over conservative. The use
+of AIMD leads to slow converge to fair-share state of
+flows. Ignorance of different flow sizes leads to long duration for
+short flows. For new arriving flows, XCP will gradually decrease the
+window sizes of existing flows to allocate bandwidth for new flows,
+thus it takes time for new flows to get their fair-share of
+bandwidth. All these contribute to the unfairness of XCP.
+A better congestion control mechanism should be able adjust to short
+flows to let them finish early as they should, and be able to allocate
+bandwidth to new flows more aggressively then XCP. 
+
+\end{document}

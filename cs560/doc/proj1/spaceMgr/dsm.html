@@ -1,0 +1,163 @@
+
+<!-- saved from url=(0070)http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/spaceMgr/dsm.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Disk Space Manager</title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+
+<!--<body bgcolor="#FFdead" text="#440000" link="#339966" vlink="#CC0000" alink="#0000CC">-->
+<body bgcolor="#FFFFFF" text="#440000" link="#339966" vlink="#CC0000" alink="#0000CC">
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tbody>
+			<tr>
+				<td>
+					<p align="center">&nbsp;</p>
+					<table border="0" width="100%">
+					  <tbody>
+						<tr>
+						    <td width="88%">
+							<p align="left"><img border="0" src="../../uadcs.gif" align="center"></p>
+							<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+							<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+							<!--<p align="center"><font size="4"><a href="http://www.cs.arizona.edu" target="_blank">Department of Computer Science</a></font></p>
+							<p align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</a></font></p>-->
+							<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+							<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+							<!--<h3 align="center"><font size="4">Department of <a href="http://www.cs.arizona.edu" target="_blank">Computer Science</a></font></h3>
+							<h3 align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</font></h3>
+							<h3 align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></h3>-->
+						     	 <!--<p align="center">
+						<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/index.html" target="" style="{text-decoration: none;}">Database&nbsp;Management&nbsp;Systems&nbsp;(3rd&nbsp;Edition)</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.dist.html" target="" style="{text-decoration: none;}">The&nbsp;Minibase&nbsp;Distribution</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/single_user.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Overview</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/project.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Modules</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.notice.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Terms&nbsp;and&nbsp;Agreement</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/history.html" target="" style="{text-decoration: none;}">Minibase&nbsp;History</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minidoc.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Documentation</a>]</nobr></p>-->
+							</td>
+ 						</tr>
+					  </tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+<br>
+
+<table dir="ltr" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><!--msnavigation--><td valign="top">
+
+
+
+<h1> Disk Space Manager </h1>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<p>
+
+   The <strong>disk space manager (DSM)</strong> (implemented as part
+   of the DB class) is 
+   the component of Minibase that takes
+   care of the allocation and deallocation of pages within a database.
+   It also performs reads and writes of pages to and from disk, and
+   provides a logical <i>file</i> layer within the context of a
+   database management system.
+
+</p><p>
+
+   A Minibase database is implemented as a single Unix file.  Its
+   pages are simply page-sized blocks of bytes within this file.  The
+   higher-level structures of a Minibase database, such as heap files
+   and B+ tree files, are actually logical files consisting of
+   collections of database pages.  In discussing the DSM,
+   whenever necessary
+   we will refer to page-sized blocks of bytes in the underlying
+   Unix file as ''pages'', and pages in higher-level structures
+   such as heap files as, for example, ''heap file pages'' in
+   order to avoid confusion.
+
+</p>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<h2>The Page Class</h2>
+
+   The abstraction of a page is provided by the Page class. All higher
+   level applications use this Page class.  
+   Higher layers impose their own structure on pages simply by casting
+   page pointers to their own record types.  The data part of a page
+   is guaranteed to start at the beginning of the block.
+
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<h2> The Database (DB) Class</h2>
+
+   The DB class provides the abstraction of a single database stored
+   on disk.  It shields the rest of the software from the fact that
+   the database is implemented as a single Unix file.
+   It provides methods for allocating additional pages (from the
+   underlying Unix file) for use in the database and deallocating
+   pages (which may then be re-used in response to subsequent
+   allocation requests).  (The DB class actually supports allocation 
+   and deallocation of a consecutive run of pages,
+   though the higher-level code usually just asks for one page at a time.) 
+
+<p>
+
+   There is one instance of the DB class for every database used.  (In
+   Minibase, a transaction is allowed to have at most one active
+   database, so there is just one instance of this class.)  The
+   operations on this class include creating and destroying databases,
+   and, as noted above, allocating and deallocating pages.  Further,
+   existing databases can be opened and closed, and there are
+   methods to retrieve certain characteristic properties of the
+   database, like the number of pages and page size.
+
+</p>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<h2>File Directory</h2>
+
+   The DB class also provides a <strong> file naming
+   service</strong>, which is used by higher-level code to create
+   logical ''files of pages''.  This service is implemented using records
+   consisting of file names and their header page ids. There are
+   functions to insert, look up, and delete file entries.
+   The set of file entries is collectively referred to as the
+   <strong>file directory.</strong>
+
+<p>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<h2>Space Management</h2>
+
+   The DB class keeps 
+   track of allocated space within the database using a fixed
+   set of pages called the <strong>space map.</strong>  
+   They can be thought of as containing a bit
+   map: one bit per database page, with ''0'' denoting that the corresponding
+   page is free and ''1'' denoting that it is allocated.
+
+<p>
+
+   The DB class maintains the space map, in addition to its other
+   duties, updating it whenever pages are allocated or deallocated.  
+
+
+</p>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<h2>Limitations, or Room for Improvement</h2>
+
+   The current implementation creates fixed-size databases; the space
+   map is set when the database is created, and never grows.  This
+   limitation would be fairly easy to remedy, either by setting a
+   maximum database size (still fixing the size of the space map, but
+   allowing the database to grow to fit the maximum number of pages
+   representable in the map), or by having the space map be a linked
+   list of pages and grow as needed.
+
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<p>
+Click here for the <a href="db.h"><b>public interface for the DB class</b></a>
+</p>
+
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<p>
+<a href="../../project.html">Back to the List of Components</a><br>
+<a href="../../minibase.html">Back to the Minibase Home Page</a><br>
+<!--A HREF="doc/report/html/project.html"-->
+<!--764 Report</A-->
+<br>
+
+<!--msnavigation--></p></td></tr><!--msnavigation--></tbody></table>
+
+
+</body></html>

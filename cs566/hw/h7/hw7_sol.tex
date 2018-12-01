@@ -1,0 +1,117 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is LaTeX file for Homework Assignment 3
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS566}
+\def\AssignmentNo{7}
+\def\DateHandedOut{Fall, 2015}
+\def\Author{Shuo Yang}
+\def\GradeID{50}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \DateHandedOut
+
+\begin{center}
+Homework Assignment \#\AssignmentNo\\
+Student: \Author\\
+GradeID: \GradeID\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+
+\vspace{1.5em}
+
+\begin{enumerate}
+\item What are some of the benefits of using Diffie-Hellman over RSA
+  for key exchange?
+
+First of all, Diffie-Hellman has performance advantage over RSA
+because generating DH keys is cheap, while generating RSA keys is
+expensive. Second, DH allows two people who don't know each other to
+securely exchange symmetric keys. RSA requires that they know each
+other’s public keys. Third, DH is often used for (Perfect) Forward
+Secrecy (PFS) since DH key generation is cheap.
+
+\item What is the things RSA can be used to perform whereas
+  Diffie-Hellman cannot?
+
+RSA can be used for encryption and decryption while DH is just a key
+exchange algorithm. In addition, RSA can also be used for digital
+signatures.
+
+\item What is forward secrecy?
+
+A communication protocol has forward secrecy if the compromise of
+long-term keys does not compromise past session keys.
+
+\item Let p = 29. Let g = 5. Let Alice’s secret x = 7. Let Bob’s
+  secret y = 17. Compute K1. Compute K2. Show your work.
+
+\underline{Alice}:\\
+$X = g^x \mod p = 5^7 \mod 29 = 28$\\
+
+\underline{Bob}:\\
+$Y = g^y \mod p = 5^{17} \mod 29 = 9$\\
+
+\underline{Alice}:\\
+$K_1 = Y^x \mod p = 9^7 \mod 29 = 28$\\
+
+\underline{Bob}:\\
+$K_2 = X^y \mod p = 28^{17} \mod 29 = 28$\\
+
+\item Compute $\phi(1343)$. Show your work.
+
+First, identify the prime factors of $1343$: $1343 = 17 *
+79$. Therefore $\phi(1343) = (17-1) * (79-1) = 1248$.
+
+\item Compute $3232313123213^{24} \mod 35$. Show your work.
+
+Since $35 = 5 * 7$, $\phi(35) = 4 * 6 = 24$.\\ 
+And $3232313123213$ is relatively prime to $35$ since
+$GCD(3232313123213, 35) = 1$ because none of $5,7$ or $35$ is a factor
+of $3232313123213$.\\  
+According to Euler's theorem, $3232313123213^{24} \mod 35 =
+3232313123213^{\phi(35)} \mod 35 = 1$.
+
+\item Compute $822981828882^{264} \mod 299$. Show your work.
+
+Since $299 = 13 * 23$, its prime factors are $13$ and $23$. Therefore
+$\phi(299) = 12 * 22 = 264$.\\
+And $822981828882$ is relatively prime to $299$ since
+$GCD(822981828882, 299) = 1$ because none of $13,23$ or $299$ is a
+factor of $822981828882$.\\
+According to Euler's theorem, $822981828882^{264} \mod 299 =
+822981828882^{\phi(299)} \mod 299 = 1$.
+
+\end{enumerate}
+\end{document}

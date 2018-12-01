@@ -1,0 +1,107 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>External Sorting</title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+<body bgcolor="#FFFFFF" text="#440000" li="" nk="#339966" vlink="#CC0000" alink="#0000CC">
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td>
+				<p align="center">&nbsp;</p>
+				<table border="0" width="100%">
+				  <tbody>
+					<tr>
+					    <td width="88%">
+						<p align="left"><img border="0" src="../uadcs.gif" align="center"></p>
+						<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+						<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+						<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+						<hr>
+						</td>
+					</tr>
+				  </tbody>
+				</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<h1>Tuples</h1>
+
+<hr>
+<p>
+</p><h1>Introduction </h1>
+Each record in a relation is a collection of bytes that
+is cast as an object of type <em>Tuple</em>.  
+Only implementors of access methods, heap files and relational operators
+need to worry about how the bytes are utilized .
+Others can treat them as just a collection of bytes.  
+<p>
+<i>Tuples</i> may have attributes of three types: <b>strings</b> (up to 255 characters),
+<b>integers</b>, and <b>real</b> numbers (floats, in C++).
+</p><p>
+Because padding of bytes is needed to align integers and floats,
+the exact number of bytes in a <i>Tuple</i> is not known ahead of time.
+When tuples are created, a large number of bytes must be allocated.
+Then the attributes list (for example: string, int, float) 
+is passed to the tuple and the tuple is constructed.  During the 
+<i>Tuple</i> construction, padding is performed and the actual size of the 
+<i>Tuple</i> with those attributes is determined.
+</p><p>
+For our (string,int,float) example tuple, with the maximum length of the
+string being 5, and the architecture having 4-byte ints and floats, both
+requiring 4-byte alignment, the tuple internals would look like:
+</p><p>
+
+</p><center>
+<table border="">
+
+<caption align="bottom">Tuple Representation In Memory
+</caption>
+
+<tbody><tr>
+    <th>string</th>
+    <th>padding</th>
+    <th>int</th>
+    <th>float</th>
+</tr>
+
+<tr>
+    <td>5 bytes</td>
+    <td>3 bytes</td>
+    <td>4 bytes</td>
+    <td>4 bytes</td>
+</tr>
+
+</tbody></table>
+</center>
+
+<p>
+The padding was added after the string to allow the int field to be
+placed at an offset that is a multiple of 4, as required by the
+example machine's architecture.
+
+<hr>
+
+</p>
+
+<h2>Design Decisions</h2>
+Padding was chosen over copying for no particular reason.  The amount
+of space wasted due to padding may not offset the time that is needed
+to copy the data into aligned space when it is needed; thus, a variant
+that uses copying could be used instead.
+<p>
+In Minibase, a tuple must fit on a single page.
+</p><p>
+<hr>
+</p><p>
+
+Click here for the <a href="tuple.h"><b>public interface</b></a>.
+
+<hr>
+<p>
+<a href="../project.html">Back to the List of Components</a><br>
+<a href="../minibase.html">Back to the Minibase Home Page</a><br>
+</p>
+</body></html>

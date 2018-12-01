@@ -1,0 +1,277 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+
+<head>
+    <title>CSc 560 Term Project 2</title>
+  </head>
+
+  <body>
+    <h1><center><font color = "blue">Spring 2017</font></center></h1>
+    <h1><center><font color = "blue">CSc 560: Database Systems Implementation</font></center></h1>
+    <h2><center><font color = "blue">Project Part 2: Buffer Manager</font></center></h2>
+    <h3><center><U><font color = "blue">Due 03/22/2017 (Wednesday) at 11:59</U></font></center></h3>
+    <br><br>
+
+<div class="MsoNormal"><h2><b><font color="#3333FF">Introduction</font></b></h2></div>
+In this assignment, you will implement a simple buffer management layer (without support for concurrency control and recovery) for the Minibase database system. 
+You can keep using <a href="http://www.cs.arizona.edu/classes/cs560/spring17/project/proj1/spaceMgr/dsm.html">Disk Space Manager</a> library provided in <a href="http://www.cs.arizona.edu/classes/cs560/spring17/project/proj1/proj1.html">Project 1</a>. 
+HTML documentation for Minibase is available on the <a href="../project.html">project</a> webpage. In particular, again you should carefully read the description of the <a href="./db.h">DB</a> class, which you will use extensively in this assignment.
+
+<p>
+<ul><h3><b><font color="blue">Notes</font></b></h3>
+<!--<li>The Minibase buffer manager layer differs from what you have to implement in that it contains methods to support concurrency control and recovery.</li>-->
+<li>Never try to decompile the existing buffer manager&#39;s library (<i>buf.a</i>) code. 
+If your buffer manager code looks similar to the decompiled one, you will get <b><font color="#FF0000">ZERO</font></b> in this project. In addition, never make any attempt to search on the web for any source code related to buffer management. The buffer manager layer for Project 2 should be your own implementation.
+</ul>
+</p>
+
+<!--<b><font color="#3333FF">Where to Find Makefiles, Code, etc.</font></b>
+<p>Copy all the files from <b>~cs564-1/proj2/src</b> into your local directory.
+The files are:
+<div style="margin-left:1.0in;text-indent:-.25in;mso-list:l3 level1 lfo5;
+tab-stops:list 1.0in">
+<blockquote>
+<li>
+<i>Makefile:</i> A sample makefile to compile your project. You will have
+to set up any dependencies by editing this file. You may also use your
+own makefile.</li>
+</blockquote>
+</div>
+
+<div style="margin-left:1.0in;text-indent:-.25in;mso-list:l3 level1 lfo5;
+tab-stops:list 1.0in">
+<blockquote>
+<li>
+<i>buf.h:</i> This file contains the specifications for the class BufMgr
+and you have to implement these specification as part of this assignment.</li>
+</blockquote>
+</div>
+
+<div style="margin-left:1.0in;text-indent:-.25in;mso-list:l3 level1 lfo5;
+tab-stops:list 1.0in">
+<blockquote>
+<li>
+<i>main.C, test_driver.C, BMTester.C:</i> Buffer manager test driver program.</li>
+</blockquote>
+</div>
+
+<div style="margin-left:1.0in;text-indent:-.25in;mso-list:l3 level1 lfo5;
+tab-stops:list 1.0in">
+<blockquote>
+<li>
+<i>sample_output:</i> Sample output of a correct implementation.</li>
+</blockquote>
+</div>-->
+
+<L1><B><font color="blue" size = 4.5>Compiling Your Code and Running the Tests</font></B></L1>
+
+	    <!--<p>Copy all the files from <b>proj1/HFPage/src</b> into your working directory. If you <i>make</i> the project, it will create an executable named <i>hfpage</i> . Right now, it does not work; you will need to fill in the bodies of the HFPage class methods. The methods are defined (empty) in file hfpage.C. 
+<p>Sample output of a correct implementation is available in <i>sample_output</i>.-->
+		    <p>Download the zip file (<a href="cs560-proj2.tar.gz">cs560-proj2.tar.gz</a>) for project 2 and unzip it (e.g., <TT>tar xvfz cs560-proj2.tar.gz</TT>) into your working directory (~/). Move to <b>~/proj2/BufMgr/src</b>. If you <i>make</i> the project, it will create an executable named <i>buftest</i>. Right now, it does not work; you will need to fill in the bodies of the <a href="buf.h">BufMgr</a> class methods. The methods are defined (empty) in file <i>buf.C</i>. An expected output of a correct implementation is available in <i>expected_output</i> in <b>~/proj2/BufMgr/src</b>. Note that there are also other directories distributed for <a href="http://www.cs.arizona.edu/classes/cs560/spring17/project/proj1/proj1.html">Project 1</a>. Instead of the buffer manager library (<i>buf.a</i>) provided in project 1, your buffer manager will be also tested on your HeapFile and HFPage implementations. If your HPage or HeapFile does not properly work, you need to fix it before proceeding with Project 2. Make sure that when your buffer manager is invoked, the same output should be displayed in both tests of HeapFile and HFPage of project 1.</p>
+
+
+<!--<L1><B><font color="blue" size = 4.5>64-bit Compiled DB Library</font></B></L1>-->
+<L1><B><font color="blue" size = 4.5>DB Library for backward compatibility</font></B></L1>
+<p align="left"><a href="libdb.a">DB</a> library</p>
+
+<L1><B><font color="blue" size = 4.5>The Buffer Manager Interface</font></B></LI>
+
+<p>
+The simplified buffer manager interface that you will implement allows a higher level program to allocate and deallocate pages on disk, 
+to bring a disk page to the buffer pool and pin it, and to unpin a page in the buffer pool.</p>
+
+The methods that you have to implement are described below:
+
+<pre style="tab-stops:595.4pt 641.2pt 687.0pt 732.8pt">
+<blockquote>
+<b>
+class BufMgr {
+
+private: 
+   unsigned int    numBuffers;
+   // fill in this area
+public:
+    Page* bufPool; // The actual buffer pool
+
+    BufMgr (int numbuf, Replacer *replacer = 0); 
+   	// Initializes a buffer manager managing "numbuf" buffers.
+	// Disregard the "replacer" parameter for now. In the full 
+  	// implementation of minibase, it is a pointer to an object
+	// representing one of several buffer pool replacement schemes.
+
+    ~BufMgr();           // Flush all valid dirty pages to disk
+
+    Status pinPage(PageId PageId_in_a_DB, Page*& page, int emptyPage);
+        // Check if this page is in buffer pool, otherwise
+        // find a frame for this page, read in and pin it.
+        // also write out the old page if it's dirty before reading
+        // if emptyPage==TRUE, then actually no read is done to bring
+        // the page
+
+    Status unpinPage(PageId globalPageId_in_a_DB, int dirty, int hate);
+        // hate should be TRUE if the page is hated and FALSE otherwise
+        // if pincount>0, decrement it and if it becomes zero,
+        // put it in a group of replacement candidates.
+        // if pincount=0 before this call, return error.
+
+    Status newPage(PageId& firstPageId, Page*& firstpage, int howmany=1); 
+        // call DB object to allocate a run of new pages and 
+        // find a frame in the buffer pool for the first page
+        // and pin it. If buffer is full, ask DB to deallocate 
+        // all these pages and return error
+
+    Status freePage(PageId globalPageId); 
+        // User should call this method if it needs to delete a page
+        // this routine will call DB to deallocate the page 
+
+    Status flushPage(PageId pageid);
+        // Used to flush a particular page of the buffer pool to disk
+        // Should call the write_page method of the DB class
+
+    Status flushAllPages();
+	// Flush all pages of the buffer pool to disk, as per flushPage.
+
+    /*** Methods for compatibility with project 1 ***/
+    Status pinPage(PageId PageId_in_a_DB, Page*& page, int emptyPage, const char *filename);
+	// Should be equivalent to the above pinPage()
+	// Necessary for backward compatibility with project 1
+
+    Status unpinPage(PageId globalPageId_in_a_DB, int dirty, const char *filename);
+	// Should be equivalent to the above unpinPage()
+	// Necessary for backward compatibility with project 1
+    
+    unsigned int getNumBuffers() const { return numBuffers; }
+	// Get number of buffers
+
+    unsigned int getNumUnpinnedBuffers();
+	// Get number of unpinned buffers
+</b></blockquote>
+</pre>
+
+<br><br>
+
+
+<L1><B><font color="blue" size = 4.5>Design Overview and Implementation Details</font></B></L1> 
+
+<p>The <i>buffer pool</i> is a collection of <i>frames</i> (page-sized sequence of main memory bytes) that is managed by the Buffer Manager. 
+It should be stored as an array <b>bufPool[numbuf]</b> of Page objects. 
+In addition, you should maintain an array <b>bufDescr[numbuf]</b> of <i>descriptors</i>, one per frame. 
+Each descriptor is a record with the following fields:
+
+<center>
+<p><i>page number, pin_count, dirtybit</i></p>
+</center>
+
+<p>The <i>pin_count</i> field is an integer, <i>page number</i> is a <b>PageId</b> object, and <i>dirtybit</i> is a boolean. 
+
+This describes the page that is stored in the corresponding frame. A page is identified by a <i>page
+number</i> that is generated by the DB class when the page is allocated,
+and is unique over all pages in the database. The <b>PageId</b> type is
+defined as an integer type in minirel.h.
+<p>A simple <i>hash table</i> should be used to figure out what frame a
+given disk page occupies.The hash table should be implemented (entirely
+in main memory) by using an array of pointers to lists of &lt;<i>page number,
+frame number</i>> pairs. The array is called the <i>directory</i> and each
+list of pairs is called a
+<i>bucket</i>. Given a <i>page number</i>, you
+should apply a <i>hash function</i> to find the directory entry pointing
+to the bucket that contains the frame number for this page, if the page
+is in the buffer pool. If you search the bucket and don't find a pair containing
+this page number, the page is not in the pool. If you find such a pair,
+it will tell you the frame in which the page resides. This is illustrated
+in Figure 1:
+<br>&nbsp;
+<br>&nbsp;
+<table>
+<tr>
+<td>
+<div style="margin-left: .5in"><img SRC="image001.gif" BORDER=0 height=420 width=747 align=RIGHT></div>
+</td>
+</tr>
+</table>
+
+<p>The hash function must distribute values in the domain of the search
+field uniformly over the collection of buckets. If we have HTSIZE buckets,
+numbered 0 through M-1, a hash function <i>h </i>of the form
+<center>
+<p><img SRC="image003.gif" BORDER=0 height=23 width=249></center>
+
+<p>works well in practice. HTSIZE should be chosen to be a prime number.
+When a page is requested the buffer manager should do the following: Check
+the buffer pool (by using the hash table) to see if it contains the requested
+page. If the page is not in the pool, it should be brought in as follows:
+<ul>
+<li>
+Choose a frame for replacement, using the LOVE/HATE replacement policy.</li>
+
+<li>
+If the frame chosen for replacement is dirty,&nbsp; <i>flush</i> it (i.e.,
+write out the page that it contains to disk, using the appropriate DB class
+method).</li>
+
+<li>
+Read the requested page (again, by calling the DB class) into the frame
+chosen for replacement; the <i>pin_count</i> and <i>dirtybit</i> for the
+frame should be initialized to 0 and FALSE, respectively.</li>
+
+<li>
+Delete the entry for the old page from the Buffer Manager's hash table
+and insert an entry for the new page. Also, update the entry for this frame
+in the <b>bufDescr</b> array to reflect these changes.</li>
+
+<li>
+<i>Pin</i> the requested page by incrementing the <i>pin_count</i> in the
+descriptor for this frame and return a pointer to the page to the requester.</li>
+</ul>
+<span style="color:blue"><b>The Love/Hate replacement policy</b></span>
+<p><span style="color:black">Theoretically, the best candidate page for
+replacement is the page that will be last requested in the future. Since
+implementing such policy requires a future predicting oracle, all buffer
+replacement policies try to approximate it one way or another. The LRU
+policy, for example, uses the past access pattern as an indication for
+the future. However, sequential flooding can ruin this scheme and MRU becomes
+more appropriate in this particular situation. In this assignment you are
+supposed to implement the <i>love/hate</i> replacement policy. The policy
+tries to enhance prediction of the future by relying on a hint from the
+upper levels about the page. The upper level user hints the buffer manager
+that the page is <i>loved</i> if it is more likely that the page will be
+needed in the future, and <i>hated</i> if it is more likely that the page
+will not be needed. The policy is supposed to maintain an MRU list for
+the hated pages and an LRU list for the loved pages. If a page is needed
+for replacement, the buffer manager selects from the list of hated pages
+first and then from the loved pages if no hated ones exist.<o:p></o:p></span>
+<p><span style="color:black">A situation may arise when a page is both
+loved and hated at the same time. This can happen if the page was pinned
+by two different users and then was unpinned by the first one as a hated
+page and by the other as a loved page. In this case, assume that "love
+conquers hate", meaning that once a page is indicated as loved it should
+remain loved.&nbsp;</span>
+
+<p>
+<L1><B><font color="blue" size = 4.5>What to Turn In</font></B></LI>
+<!--<p>You are required to turn in your copy of all source files in the handin directory, this includes all the files needed to make hfpage and run the test program. The TAs should be able to go to your handin directory and type <i>make</i> and <i>hfpage</i>, to run the program. Note that you should not need to change any files other than <i>hfpage.C</i>.-->
+<p>You are required to turn in your copy of all source files in the handin directory. 
+This includes all the files needed to make and run your executable &#8212; <u><i>buftest</i></u> &#8212; in <b>~/proj2/BufMgr</b>. 
+We should be able to go to your handin directory, and type <i>make</i> and run the program (<u><i>buftest</i></u>) in <b>~/proj2/BufMgr/src</b>. 
+Note that you should not need to change any files other than <u><i>buf.C</i></u> or <u><i>buf.h</i></u>. 
+In addition, for testing your buffer manager on project 1, you should also submit all the files needed to make and run your executables &#8212; <i>hfpage</i> and <i>heaptest</i> &#8212; in <b>~/proj2/HFPage/src/</b> and <b>~/proj2/HeapFile/src</b>, respectively. 
+
+
+<p>Once you have finished your project, please tar your directory (i.e., <TT>proj2.tar</TT>) and and email to Mina minakazemimanesh@email.arizona.edu the tar file. </p>
+
+
+ 
+
+<p>Please remember late submissions will not be accepted. Make sure to start early! 
+
+</UL>
+
+    <hr>
+	<script language="JavaScript">
+	<!-- Hide JavaScript...
+	var LastUpdated = document.lastModified;
+	document.writeln ("This page was last updated " + LastUpdated);
+	// End Hiding -->
+	</script>
+  </body>
+</html>

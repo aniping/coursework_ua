@@ -1,0 +1,6 @@
+q7r1 = project (select (sale) (dname="Navigation")) (itemno)
+q7r2 = join (select (supplier) (splname="Nepalese_Corp")) (delivery) (spl#=splno)
+q7r3 = project (q7r2) (itemnum)
+q7r4 = (q7r1) union (q7r3)
+display q7r4
+

@@ -1,0 +1,86 @@
+look into assembly code, find no jle, jg, etc in SECRET(), but there are
+seta, setb, etc, which are used to set value given some conditions. This
+is a good sign!
+
+(gdb) break *0x400b9a
+Breakpoint 1 at 0x400b9a
+(gdb) run 23
+Starting program: /p2/hs/shuoyang/cs566/assignment2-B-1/Shuo_Yang/challenge 23
+
+Breakpoint 1, 0x0000000000400b9a in SECRET ()
+(gdb) print $rax
+$1 = 1398629497
+(gdb) print $rcx
+$2 = 1442345290
+(gdb) print $rbx
+$3 = 140737488349020
+(gdb) quit
+
+asm code around the break point:
+
+449  400b97:       48 39 c1                cmp    %rax,%rcx
+450  400b9a:       0f 97 c0                seta   %al
+451  400b9d:       0f b6 c0                movzbl %al,%eax
+
+So seems that $rax stores the expiration time, and $rbx stores the returned
+value (tv_sec) of gettimeofday. Bingo!
+
+Then invoke gdb with -write option to change seta into setbe: 
+
+(gdb) set {unsigned char}0x400b9b = 0x96
+(gdb) quit
+
+In addition, this is how to trace the value filled by gettimeofday:
+
+(gdb) break gettimeofday
+Breakpoint 1 at 0x400520
+(gdb) run 23
+Starting program: /p2/hs/shuoyang/cs566/assignment2-B-1/Shuo_Yang/challenge 23
+
+Breakpoint 1, __gettimeofday () at ../sysdeps/unix/sysv/linux/x86_64/gettimeofday.c:31
+31	   ../sysdeps/unix/sysv/linux/x86_64/gettimeofday.c: No such file or directory.
+(gdb) where
+#0  __gettimeofday () at ../sysdeps/unix/sysv/linux/x86_64/gettimeofday.c:31
+#1  0x00007ffff7de8855 in elf_ifunc_invoke (addr=<optimized out>) at ../sysdeps/x86_64/dl-irel.h:33
+#2  _dl_fixup (l=<optimized out>, reloc_arg=<optimized out>) at ../elf/dl-runtime.c:150
+#3  0x00007ffff7def235 in _dl_runtime_resolve () at ../sysdeps/x86_64/dl-trampoline.S:42
+#4  0x00000000004010f7 in SECRET ()
+#5  0x000000000040076e in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x00007ffff7ffb9f4 in gettimeofday ()
+(gdb) where
+#0  0x00007ffff7ffb9f4 in gettimeofday ()
+#1  0x00000000004010f7 in SECRET ()
+#2  0x000000000040076e in main ()
+(gdb) print $rdi
+$1 = 140737488348992
+(gdb) print $rsi
+$2 = 0
+
+$rdi is used for the 1st argument by x86_64 convention, while $rsi is for 2nd argument.
+
+(gdb) n
+Single stepping until exit from function gettimeofday,
+which has no line number information.
+0x00000000004010f7 in SECRET ()
+(gdb) where
+#0  0x00000000004010f7 in SECRET ()
+#1  0x000000000040076e in main ()
+(gdb) display/i $pc
+1: x/i $pc
+=> 0x4010f7 <SECRET+2372>:	mov    %eax,(%rbx)
+(gdb) x/u 140737488348992
+0x7fffffffe740:	1442342850
+(gdb)
+0x7fffffffe744:	0
+(gdb)
+0x7fffffffe748:	869635
+(gdb)
+0x7fffffffe74c:	0
+(gdb)
+0x7fffffffe750:	0
+
+This shows that tv_sec (unsigned long) is filled with 1442342850 while
+tv_usec (unsigned long) is filled with 869635, each of them is 8 bytes long.

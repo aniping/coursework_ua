@@ -1,0 +1,63 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>External Sorting</title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+<body bgcolor="#FFFFFF" text="#440000" li="" nk="#339966" vlink="#CC0000" alink="#0000CC">
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td>
+				<p align="center">&nbsp;</p>
+				<table border="0" width="100%">
+				  <tbody>
+					<tr>
+					    <td width="88%">
+						<p align="left"><img border="0" src="../uadcs.gif" align="center"></p>
+						<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+						<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+						<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+						<hr>
+						</td>
+					</tr>
+				  </tbody>
+				</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<h1>External Sorting</h1>
+
+<P>
+Sorting a collection of records on some (search) key is a very useful
+operation. 
+When the data to be sorted is too large to fit into available main memory, we need to
+use an <i> external sorting </i> algorithm. Such algorithms seek to minimize the
+number of disk accesses.  
+
+<P>
+Minibase supports <i> external merge sort</i>
+(see the text for a full description):
+<P>
+Suppose we have <b>M</b> buffer pages available in memory, and we need to sort a large
+file with, say, <b>N</b> pages. There are two passes for the external sort.
+<OL>
+  <LI> In Pass 0, read in M pages at a time and sort internally to produce ceil(N/M) runs
+       of M pages each (except the last run, which may contain fewer pages).
+       Runs are held in temporary <A HREF="../proj1/spaceMgr/heap_file.html"><B>heap files</B></A>.
+  <LI> In Passes i = 1, 2, ..., use M - 1 buffer pages for input, and use the remaining
+       page for output; thus you do a M - 1 way merge in each pass.
+</OL>
+<hr>
+<P>
+The public interface for the external sorting utility is available
+<i> <A HREF="sort.h"> here.</A></i>
+<P>
+
+<hr>
+<p>
+<a href="../project.html">Back to the List of Components</a><br>
+<a href="../minibase.html">Back to the Minibase Home Page</a><br>
+</p>
+</body></html>

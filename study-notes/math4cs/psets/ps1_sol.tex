@@ -1,0 +1,216 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+\title{Problem Set 1 - Solution}
+
+\begin{document}
+\maketitle
+\hrule\smallskip
+
+\begin{enumerate}
+\item % problem 1
+  Prove by contradiction. Suppose that $\sqrt[3]{2}$ is sensible. Then
+  by definition, there exist positive integers $a$ and $b$ such that
+  $\sqrt{a/b} = \sqrt[3]{2}$. Squaring both sides of the equation gives us
+  $a/b=\sqrt[3]{4}$, which implies that $\sqrt[3]{4}$ is
+  rational. 
+
+  This means there exists positive integers $x$ and $y$ such that
+  $x/y=\sqrt[3]{4}$ and $x/y$ is in lowest term. Therefore, we have:
+  \begin{align}
+    x/y = \sqrt[3]{4} \\
+    x^3/y^3 = 4 \\
+    x^3 = 4y^3
+  \end{align}
+
+In the last equation, the right side is even, so is the left
+side. Since $x^3$ is even, $x$ must be even. Therefore $x^3$ is a
+multiple of 8, this implies that $y^3$ is also a even number, thus $y$
+is even, too. $x$ and $y$ are both even, this contradicts the
+assumption that $x/y$ is in lowest term. 
+
+Thus $\sqrt[3]{4}$ is irrational, the original assumption must not be
+true. 
+
+\item % problem 2
+  \textbf{A Wrong Attempt:}
+  \begin{equation}
+    \exists{x}. \text{  } (E(x,y) \land E(x,z) \land x \neq y \land x
+    \neq z \land y \neq z)
+  \end{equation}
+  This doesn't say ``$x$ emailed exactly two other people in the
+  class.". It also doesn't existentially quantify $y$ and $z$.
+
+  \textbf{Right Attempt:} \\
+  First, we modify the above predicate to express that there exist
+  students $x$, $y$ and $z$ such that $x$ have emailed $y$ and $z$. 
+  \begin{equation}
+    \exists{x}\exists{y}\exists{z}. \text{  } (E(x,y) \land E(x,z)
+    \land x \neq y \land x \neq z \land y \neq z)
+  \end{equation}
+
+  The following predicate restricts that $x$ emailed exactly $y$ and
+  $y$, besides herself.
+  \begin{equation}
+    \forall{s}, \text{ } E(x,s) \implies s = x \lor s = y \lor s = z
+  \end{equation}
+
+  Combining these two predicates, we can say that there exists some
+  student $x$ who has emailed to exactly two other students $y$ and
+  $z$, besides possibly herself.
+  \begin{align}
+    \exists{x}\exists{y}\exists{z}. \text{  } (E(x,y) \land E(x,z)
+    \land \\ x \neq y \land x \neq z \land y \neq z \land \\
+    \forall{s}, \text{ } E(x,s) \implies s = x \lor s = y \lor s = z)
+  \end{align}
+
+\item % problem 3
+  \begin{enumerate}
+  \item
+    $\exists{a,b,c}. \text{ } (n = a \cdot a + b \cdot b + c \cdot c)$
+  \item 
+    We can express $x=1$ as: $\forall{y}. \text{ }(xy=y)$. Further we
+    can express $x>1$ as: $\exists{y}. \text{ } (y=1 \land
+    x>y)$. Replacing $y=1$ with the previous predicate gives us:
+    $\exists{y}. \text{ } (\forall{z}. \text{ }(yz=z) \land x>y)$.
+  \item 
+    \begin{equation}
+      \lnot(\exists{x}. \text{ }(x>1 \land x<n \land
+      \exists{y}. \text{ } (y>1 \land y<n \land xy=n)))
+    \end{equation}
+
+    \textbf{A better version:}\\
+    \begin{equation}
+      IS-PRIME(n) \equiv (n > 1) \land 
+      \lnot(\exists{x}\exists{y}. \text{ }(x>1 \land y>1 \land x \cdot
+      y=n))
+    \end{equation}
+    
+  \item
+    \begin{equation}
+      \exists{n}\exists{p}\exists{q}. \text{ IS-PRIME}(p) \land
+      \text{ IS-PRIME}(q) \land (n = p \cdot q) \land (p \neq q)
+    \end{equation}
+
+  \item
+    \textbf{My Attempt:}\\
+    \begin{equation}
+      \lnot(\exists{n}. \text{ IS-PRIME}(n) \land \text{ IS-PRIME}(p)
+      \land \text{ }\forall{p}, n > p) 
+    \end{equation}
+    \textbf{Right Solution:}\\
+    \begin{equation}
+      \lnot(\exists{n}. \text{ IS-PRIME}(n) \land (\forall{p}, \text{
+        IS-PRIME}(p) \implies n \geq p))
+    \end{equation}
+
+  \item
+    We can express $n > 2$ as:
+    \begin{equation}
+      \exists{k}. \text{ }(k = 1) \land (n > k+k).
+    \end{equation}
+    So the predicate is:
+    \begin{equation}
+      \forall(n), (n > 2 \land \exists{k}. n=k+k) \implies
+      \exists{p}\exists{q}. \text{ IS-PRIME}(p) \land \text{
+        IS-PRIME}(q) \land (n = p + q) 
+    \end{equation}
+
+  \item
+    \begin{equation}
+      \forall(n), (n > 1 \implies
+      \exists{p}. \text{ IS-PRIME}(p) \land (n < p) \land (p < n+n))
+    \end{equation}
+
+  \end{enumerate}
+
+\item % problem 4
+  \begin{proof}
+    We prove by contradiction. Assume that there is a surjection $f$ from
+    set $A$ to its powerset for some $A$ which is infinite. Let the
+    set $W$ be $W=\{x \in A | x \notin f(x) \}$. So by definition,
+    \begin{equation}
+      x \in W \iff x \notin f(x)
+    \end{equation}
+    $W$ is a member of $\mathcal{P}(A)$ since $W$
+    is a subset of $A$. Because there is a surjection $f$ from $A$ to
+    $\mathcal{P}(A)$, we know that there must exist an element $a \in
+    A$ such that $W=f(a)$. So from the above equation, we have,
+    \begin{equation}
+      x \in f(a) \iff x \notin f(x)
+    \end{equation}
+    for all $x \in A$.
+    Substituting $a$ for $x$ yields a contradiction, proving that
+    there cannot be such a $f$. 
+  \end{proof}
+
+\item % problem 5
+\begin{enumerate}
+\item
+  \begin{proof}
+  Let $D$ be the domain for the variables and $P$, $Q$ be some binary
+  predicates on $D$. We need to show that if $\exists{z}. [P(z) \land
+    Q(z)]$ holds under this interpretation, then so does $[\exists{x}. P(x)
+    \land \exists{y}. Q(y)]$.
+
+  So suppose $\exists{z}. [P(z) \land Q(z)]$. So some element $z_0 \in
+  D$ such that $P(z) \land Q(z)$ is true. So there exists some $x \in
+  D$ and some $y \in D$ such that $P(z) \land Q(z)$ is true. Namely,
+  $x = z_0$ and $y=z_0$. That is, $[\exists{x}. P(x) \land
+    \exists{y}. Q(y)]$ holds under this interpretation, as required. 
+  \end{proof}
+\item
+  \begin{proof}
+    We can prove by describing an counter model. Let the domain be the
+    integers and $P(x)$ be $x > 100$, and $Q(y)$ be $y <
+    50$. $[\exists{x}. P(x) \land \exists{y}. Q(y)]$ would be true
+    because we can let $x = 101$ and $y = 49$. But $\exists{z}. [P(z)
+      \land Q(z)]$ asserts that there exists an integer $z$ such that
+    $z > 100$ while $z < 50$, which is certainly false. 
+  \end{proof}
+\end{enumerate}
+
+\item % problem 6
+  \begin{enumerate}
+  \item
+    Let $A = {0}$, $B = {1}$, $C = {2}$ and $D = {3}$. Then $L = (A
+    \cup C) \times (B \cup D) = \{(0,1), (0,3), (2,1), (2,3)\}$ and $R
+    = (A \times B) \cup (C \times D) = \{(0,1), (2,3)\}$. Thus $L \neq
+    R$. 
+
+  \item
+    The mistake lies in the third iff. The claim: \\
+    ``either $x \in A$ or $x \in C$, and either $y \in B$ and $y \in
+    D$  \textbf{iff}  \\
+    ($x \in A$ and $y \in B$) or else ($x \in C$ and $y \in D$)"\\
+    is not true. There are 4 possible combinations in total. Two
+    others are ($x \in A$ and $y \in D$) and ($x \in C$ and $y \in
+    B$).
+
+  \item
+    Replacing the third ``iff" with ``which is true when" which yields
+    a correct prove that $(x,y) \in L$ is true when $(x,y) \in R$,
+    which implies that $R \subseteq L$.
+  \end{enumerate}
+
+\end{enumerate}
+
+\end{document}

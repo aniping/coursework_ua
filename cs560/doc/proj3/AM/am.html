@@ -1,0 +1,79 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<title>Access Methods</title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+
+<body bgcolor="#FFFFFF" text="#440000" link="#339966" vlink="#CC0000" alink="#0000CC">
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td>
+				<p align="center">&nbsp;</p>
+				<table border="0" width="100%">
+				  <tbody>
+					<tr>
+					    <td width="88%">
+						<p align="left"><img border="0" src="../../uadcs.gif" align="center"></p>
+						<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+						<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+						<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+						<hr>
+						</td>
+					</tr>
+				  </tbody>
+				</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<h1>Access Methods</h1>
+<hr>
+
+<h2>Introduction</h2>
+An access method (or index) facilitates retrieval of a desired record
+from a relation.  In Minibase, all records in a relation are stored in
+a Heap File.  An index consists of a collection of records of the
+form &lt;key value,rid&gt;, where `key value' is a value for the 
+<b>search key</b> of the index, and `rid' is the id of a record
+in the relation being indexed.  Any number of indexes can be
+defined on a relation.  
+<p>
+Only <b><a href="../BTree/BTree.html">B+ Tree</a></b>
+indexes are currently supported.
+</p><p>
+
+Minibase only supports unclustered indexes.
+(In fact, dense, unclustered indexes storing
+key/rid-of-data-record pairs; Alternative 2, in terms of the <b>text</b></a>.)
+Implementing clustered indexes would require major changes.
+<!-- Optimizer homepage is broken... now..-->
+<!--(The <b><a href="../optimizer/optimizer.html">optimizer</a></b>,
+however, can correctly handle clustered vs. unclustered 
+indexes.  Of course, this is only useful while running the optimizer
+in stand-alone mode against synthetic catalogs.)-->
+</p>
+
+<hr>
+
+<h2>Design Decisions</h2>
+All access methods are based on a <b><a href="../index.h">common C++ base class.</a></b>
+A particular access method can be understood in terms of its
+<em>file structure</em> (which determines how the pages in the index file
+are organized), <em>page structures</em> (typical page format), and
+the functionality of <em>scans</em> (e.g., whether range scans are
+supported).
+
+<hr>
+<p>
+<a href="https://www2.cs.arizona.edu/classes/cs560/spring17/project/project.html">Back to the List of Components</a><br>
+<a href="https://www.cs.arizona.edu/classes/cs560/spring17/project/minibase.html">Back to the Minibase Home Page</a><br>
+</p>
+<br>
+
+
+<!--msnavigation--></p></td></tr><!--msnavigation--></tbody></table>
+
+</td></tr></tbody></table></body></html>

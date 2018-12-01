@@ -1,0 +1,137 @@
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Error Reporting</title>
+</head>
+<body bgcolor="#FFFFFF" text="#440000" link="#339966" vlink="#CC0000" alink="#0000CC">
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tbody>
+			<tr>
+				<td>
+					<p align="center">&nbsp;</p>
+					<table border="0" width="100%">
+					  <tbody>
+						<tr>
+						    <td width="88%">
+							<p align="left"><img border="0" src="uadcs.gif" align="center"></p>
+							<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+							<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+							<!--<p align="center"><font size="4"><a href="http://www.cs.arizona.edu" target="_blank">Department of Computer Science</a></font></p>
+							<p align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</a></font></p>-->
+							<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+							<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+							</td>
+ 						</tr>
+					  </tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+<br>
+
+<h1>Error Reporting</h1>
+
+<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+<p>
+
+
+A layered approach is used to error reporting, but 
+the path that error discovery takes may be confusing at times
+since the calling sequence between layers can be complex
+(e.g., DB-&gt;BufMgr-&gt;DSM).  
+</p><p>
+Each layer of the database has associated with it a list of errors that
+can occur. Character strings with messages corresponding to these errors
+are stored in arrays.  These arrays are registered to the global error
+object <tt>minibase_errors</tt> by constructing an <tt>error_string_table</tt>
+using the array. Each layer is responsible for establishing and registering
+it's error string array.
+</p><p>
+A global error class is used to log errors as they occur.
+When an error is discovered, the following actions are performed:
+</p><ol>
+<li> Push the name of the layer in which the execution is currently in.
+     For example, suppose the error was discovered by the buffer manager
+     after a call to a function of the DB manager, the buffer manager
+     pushes <i>BufMgr</i> on the error stack.
+</li><li> Push the offset into the array (for that class) of error messages.
+</li><li> Push a string with some context sensitive information about the error.
+     This information includes the name of the file and the line number
+     in the file where this error discovery has occured.
+</li></ol>
+
+This elaborate protocol allows the user to see where the error was first
+discovered and to see how the error caused various functions to fail.
+Error correction can also be done if desired by popping errors from the
+stack and correcting the error.
+<p>
+<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+</p><p>
+</p><h2>Design Decisions </h2> 
+Macros disguise the details of this protocol. <b>MINIBASE_FIRST_ERROR</b> is called
+to register the "first" error. For example, if the HeapFile sees that the length of a (new) record to be updated 
+is different than that of the (old) record, the HeapFile posts an 
+INVALID_UPDATE error as : 
+<pre>MINIBASE_FIRST_ERROR( HEAPFILE, INVALID_UPDATE ); </pre>
+</p>
+
+<p> 
+As another example, if the buffer manager detects that
+the buffer pool is too full to complete a certain operation, it posts a
+BUFFEREXCEEDED error as : <p>
+
+<pre>MINIBASE_FIRST_ERROR( BUFMGR, BUFFEREXCEEDED );</pre>
+
+<p>
+The <b>MINIBASE_CHAIN_ERROR</b> macro is called for "chained" error.
+For example, if the HeapFile calls on the buffer manager to (un)pin
+a page in buffer pool, and that operation fails, the HeapFile adds an error
+that records the fact that the execution path that failed went through it:
+</p>
+
+<pre>
+status = MINIBASE_BM-&gt;(un)pinPage( ... );
+if ( status != OK )
+    return MINIBASE_CHAIN_ERROR( HEAPFILE, status );
+</pre>
+
+Or, if the buffer manager calls on the database manager to write 
+a page to disk, and that operation fails, the buffer manager adds an error 
+that records the fact that the execution path that failed went through it:
+</p>
+
+<pre>
+status = MINIBASE_DB-&gt;write_page( ... );
+if ( status != OK )
+    return MINIBASE_CHAIN_ERROR( BUFMGR, status );
+</pre>
+
+
+<p>
+Sometimes, you wish to post a different error message, but still acknowledge
+that the error resulted from a prior error.  This is a combination of the
+above situations.  For this, use the <b>MINIBASE_RESULTING_ERROR</b> macro:
+</p>
+
+<pre>
+status = MINIBASE_DB-&gt;write_page( ... );
+if ( status != OK ) 
+	 return MINIBASE_RESULTING_ERROR( BUFMGR, status, BUFFEREXCEEDED )
+</pre>
+<p>
+
+<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+</p><p>
+Click here for the <b><a href="new_error.h">error interface</a></b>.
+(Includes extensive in-line documentation.)
+</p><p>
+<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+</p><p>
+<a href="project.html">Back to the List of Components</a><br>
+<a href="index.html">Back to the Minibase Home Page</a><br>
+</p><p>
+
+
+</p></body></html>

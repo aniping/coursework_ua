@@ -1,0 +1,229 @@
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>CSc 560 Term Project1</title>
+  </head>
+
+  <body>
+    <h1><center><font color = "blue">Spring 2017</font></center></h1>
+    <h1><center><font color = "blue">CSc 560: Database Systems Implementation</font></center></h1>
+    <!--<h2><center><font color = "blue">Instructor: Richard T. Snodgrass</font></center></h1>-->
+    <!--<h2><center><font color = "blue">(Grader: Young-K. Suh)</font></center></h1>-->
+    <h2><center><font color = "blue">Project part1: HeapFile, HFPage, and Scan</font></center></h2>
+    <h3><center><U><font color = "blue">Due Monday, March 1 at midnight</U></font></center></h3>
+    <!--<h3><center><U><font color = "blue">Due TBD</U></font></center></h3>-->
+    <br><br>
+    
+    <UL>
+      <L1><B><font color="blue" size = 4.5>Introduction</font></B></LI> 
+	<p> In this assignment, you will implement the page structure for the Heap File layer. You will be given libraries for the lower layers (Buffer Manager and Disk Space Manager), and some driver routines to test the code.
+      <br><br>
+      <L1><B><font color="blue" size = 4.5>Preliminary Work</font></B></LI>
+	<p>Begin by reading the description of Heap Files in <b>Section 9.5.1</b>, and the description of page formats in <b>Section 9.6</b>. A HeapFile is seen as a collection of records. Internally, records are stored on a collection of HFPage objects.
+
+	  <p>You will be implementing the <a href="./spaceMgr/hfpage.h">HFPage</a> class (as described below) and <a href="./spaceMgr/heap_file.html">HeapFile</a> class (as described below) code, as well as the part of the <a href="./spaceMgr/scan.h">Scan</a> class (as described below) code. Read the description in the text of how variable length records can be stored on a slotted page, and follow this page organization.
+	  <br><br>
+	  <L1><B><font color="blue" size = 4.5>Compiling Your Code and Running the Tests</font></B></LI>
+
+	    <!--<p>Copy all the files from <b>proj1/HFPage/src</b> into your working directory. If you <i>make</i> the project, it will create an executable named <i>hfpage</i> . Right now, it does not work; you will need to fill in the bodies of the HFPage class methods. The methods are defined (empty) in file hfpage.C. 
+<p>Sample output of a correct implementation is available in <i>sample_output</i>.-->
+		    <p>Download the zip file (<a href="cs560-proj1.tar.gz">cs560-proj1.tar.gz</a>) for Project 1 and unzip it (e.g., <TT>tar xvfz cs560-proj1.tar.gz</TT>) into your working directory (~/). Move to <b>~/proj1/HFPage/src</b>. If you <i>make</i> the project, it will create an executable named <i>hfpage</i>. Right now, it does not work; you will need to fill in the bodies of the HFPage class methods. The methods are defined (empty) in file <i>hfpage.C</i>. Next, move to <b>~/proj1/HeapFile/src</b>. If you <i>make</i> the project, it will create an executable named <i>heaptest</i>. It does not work, either; you will also need to fill in the bodies of the HeapFile and Scan class methods. The methods are defined (empty) in files <i>heapfile.C</i> and <i>scan.C</i>. There is another <i>hfpage.C</i> in the directory, but indeed you can simply replace it with your <i>hfpage.C</i>. 
+<p>An expected output of a correct implementation is available in <i>expected_output</i> in <b>~/proj1/HFPage/src</b> and <b>~/proj1/HeapFile/src</b>, respectively.
+<br><br>
+<L1><B><font color="blue" size = 4.5>Design Overview and Implementation Details</font></B></LI> 
+
+<h3><U>HFPage class</U></h3>
+
+<p>Have a look at the file <a href="./spaceMgr/hfpage.h"><i>hfpage.h</i></a> in <b>~/proj1/HFPage/include</b>. It contains the interfaces for the HFPage class. This class implements a "heap-file page" object. Note that the protected data members of the page are given to you. All you should need to do is implement the public member functions. You should put all your code into the file <i>hfpage.C</i>.
+
+<p>A note of the slot directory: In the description in the text, the slot directory is located at the end of the page, and grows toward the beginning. This has confused students in the past, since it means that negative offsets into the slot directory have to be used, so the current definition of HFPage has the slot directory at the beginning of the page, after a few fixed member fields, and growing toward the end. This does mean, however, that you will need to write the code so the records themselves are placed beginning at the end of the page. Be very careful with your pointer arithmetic.
+
+<p>Also note that in order to add a record to a page, there has to be a room for the record itself in the data area, and also room for a new slot in the data area (unless there happens to be a pre-allocated slot that's empty).
+
+<p>Please follow the <A HREF="../error.html"><u><font color="blue">Minibase Error Protocol</u></font></A>. An example file illustrating the use of the error protocol is available in <b>~/proj1/HFPage/src/ErrProc.sample</b>. It covers much of what you need to know about the protocol. You can look at <b>new_error.h</b> for more details. It is in <b>~/proj1/HFPage/include</b>.
+<br><br>
+<L1><B><font color="blue" size = 4.5>The Methods to be Implemented</font></B></LI> 
+
+<h4><U>Public methods</U></h4>
+
+<pre><B>void HFPage::init(PageId pageNo)</B></pre>This member function is used to initialize a new heap file page with page number pageNo. It should set the following data members to reasonable defaults: nextPage, PrevPage, slotCnt, curPage, usedPtr, freeSpace. You will find the definitions of these data members in <i>hfpage.h</i>. The nextPage and prevPage data members are used for keeping track of pages in a HeapFile.
+
+A good default unknown value for a PageId is INVALID_PAGE, as defined
+in <i>page.h</i>. Note that usedPtr is an offset into the data array, not a pointer.
+
+<pre><b>PageId HFPage::getPrevPage()</b></pre> This member function should return the page id stored in the prevPage data member.
+
+<pre><b>void HFPage::setPrevPage(PageId pageNo)</b></pre> This member function sets the prevPage data member.
+
+<pre><b>PageId HFPage::getNextPage()</b></pre> This member function should return the page id stored in the nextPage data member.
+
+<pre><b>void HFPage::setNextPage(PageId pageNo)</b></pre>This member function sets the nextPage data member.
+
+<pre><b>Status HFPage::insertRecord(char* recPtr, int reclen, RID& rid)</b></pre> This member function should add a new record to the page. It returns OK if everything went OK, and DONE if sufficient space does not exist on the page for the new record. If it returns OK, it should set rid to be the RID of the new record (otherwise it can leave rid untouched.) Please note in the parameter list <b>recPtr</b> is a char pointer and <b> RID& </b> denotes passed by reference.
+
+
+The Status enumerated type is defined in <i>new_error.h</i> if you're curious about it. You may want to look that file over and handle errors in a more informative manner than suggested here.
+
+The RID struct is defined to be:
+
+<!--<p><b>Struct RID {
+<p>PageID pageNo;
+<br>int        slotNo;
+<p>int operator == (const RID rid) const
+<br>{ return (pageNo == rid.pageNo) && (slotNo == rid.slotNo); };
+
+<p>int operator != (const RID rid) const
+<br>{ return (pageNo != rid.pageNo) || (slotNo != rid.slotNo); };
+
+<p>friend ostream& operator << (ostream& out, const struct RID rid);<br>
+};</b>-->
+
+<b><pre>
+Struct RID {
+	PageID pageNo;
+	int        slotNo;
+	int operator == (const RID rid) const
+	{ return (pageNo == rid.pageNo) && (slotNo == rid.slotNo); };
+
+	int operator != (const RID rid) const
+	{ return (pageNo != rid.pageNo) || (slotNo != rid.slotNo); };
+
+	friend ostream& operator << (ostream& out, const struct RID rid);
+};
+</pre></b>
+
+<p>In C++, <b>struct</b> are aggregate data types built using elements of other types. The pageNo identifies a physical page number (something that the buffer manager and the DB layers understand) in the file. The slotNo specifies an entry in the slot array on the page.
+
+ <!-- 
+<p><b>Status HFPage::deleteRecord(const RID& rid):</b> This member function deletes the record with RID rid from the page, compacting the hole created. Compacting the hole, in turn, requires that all the offsets (in the slot array) of all records after the hole be adjusted by the size of the hole, because you are moving these records to "fill" the hole. You should leave a "hole" in the slot array for the slot which pointed to the deleted record, if necessary, to make sure that the rids of the remaining records do not change. The slot array can be compacted only if the record corresponding to the last slot is being deleted. It returns OK if everything goes OK, or FAIL otherwise. (what could go wrong here?)
+<p><b>Status HFPage::firstRecord(RID& firstRid):</b> This routine should set firstRid to be the rid of the "first" record on the page. The order in which you return records from a page is entirely up to you. If you find a first record, return OK, else return DONE.
+
+<p><b>Status HFPage::nextRecord(RID curRid, RID& nextRid):</b> Given a <I> valid </I> current RID, curRid, this member function stores the next RID on the page in the nextRid variable. Again, the order of your return records is up to you, but do make sure you return each record exactly once if someone continually calls nextRecord! Don't worry about changes to the page between successive calls (e.g. records inserted to or deleted from the page). If you find a next RID, return OK, else return DONE. In case of an error, return FAIL.
+
+<p><b>Status HFPage::getRecord(RID rid, char * recPtr, int& recLen):</b> Given a rid, this routine copies the associated record into the memory address *recPtr. You may assume that the memory pointed by *recPtr has been allocated by the caller. RecLen is set to the number of bytes that the record occupies. If all goes well, return OK, else return FAIL.
+
+<p><b>Status HFPage::returnRecord(RID rid, char*& recPtr, int& recLen):</b> This routine is very similar to HFPage::getRecord, except in this case you do not copy the record into a caller-provided pointer, but instead you set the caller's recPtr to point directly to the record on the page. Again, return either OK or FAIL.
+<p>DONE is a special code for non-errors that are nonetheless not "OK": it generally means "finished" or "not found."  FAIL is for errors that happen outside the bounds of a subsystem.
+
+<p><b>int HFPage::available_space(void):</b> This routine should return the amount of space available for a new record that is left on the page.  For instance, if all slots are full and there are 100 bytes of free space on the page, this method should return (100 - sizeof(slot_t)) bytes.  This accounts for the fact that sizeof(slot_t) bytes must be reserved for a new slot and cannot be used by a new record.
+<p><b>bool HFPage::empty(void):</b> Returns true if the page has no records in it, and false otherwise.
+-->
+
+<pre><b>Status HFPage::deleteRecord(const RID& rid)</b></pre> This member function deletes the record with RID rid from the page, compacting the hole created. Compacting the hole, in turn, requires that all the offsets (in the slot array) of all records after the hole be adjusted by the size of the hole, because you are moving these records to "fill" the hole. You should leave a "hole" in the slot array for the slot which pointed to the deleted record, if necessary, to make sure that the rids of the remaining records do not change. The slot array can be compacted only if the record corresponding to the last slot is being deleted. It returns OK if everything goes OK, or FAIL otherwise. (what could go wrong here?)
+<pre><b>Status HFPage::firstRecord(RID& firstRid)</b></pre> This routine should set firstRid to be the rid of the "first" record on the page. The order in which you return records from a page is entirely up to you. If you find a first record, return OK, else return DONE.
+
+<pre><b>Status HFPage::nextRecord(RID curRid, RID& nextRid)</b></pre> Given a <I> valid </I> current RID, curRid, this member function stores the next RID on the page in the nextRid variable. Again, the order of your return records is up to you, but do make sure you return each record exactly once if someone continually calls nextRecord! Don't worry about changes to the page between successive calls (e.g. records inserted to or deleted from the page). If you find a next RID, return OK, else return DONE. In case of an error, return FAIL.
+
+<pre><b>Status HFPage::getRecord(RID rid, char * recPtr, int& recLen)</b></pre> Given a rid, this routine copies the associated record into the memory address *recPtr. You may assume that the memory pointed by *recPtr has been allocated by the caller. RecLen is set to the number of bytes that the record occupies. If all goes well, return OK, else return FAIL.
+
+<pre><b>Status HFPage::returnRecord(RID rid, char*& recPtr, int& recLen)</b></pre> This routine is very similar to HFPage::getRecord, except in this case you do not copy the record into a caller-provided pointer, but instead you set the caller's recPtr to point directly to the record on the page. Again, return either OK or FAIL.
+<p>DONE is a special code for non-errors that are nonetheless not "OK": it generally means "finished" or "not found."  FAIL is for errors that happen outside the bounds of a subsystem.
+
+<pre><b>int HFPage::available_space(void)</b></pre> This routine should return the amount of space available for a new record that is left on the page.  For instance, if all slots are full and there are 100 bytes of free space on the page, this method should return (100 - sizeof(slot_t)) bytes.  This accounts for the fact that sizeof(slot_t) bytes must be reserved for a new slot and cannot be used by a new record.
+
+<pre><b>bool HFPage::empty(void)</b></pre> Returns true if the page has no records in it, and false otherwise.
+
+<h3><U>HeapFile class</U></h3>
+
+<p>Have a look at the file <a href="./spaceMgr/heapfile.h"><i>heapfile.h</i></a> in <b>~/proj1/HeapFile/include</b>. It contains the interfaces for the HeapFile class. This class implements a "heapfile" object. Note that you should implement the public and private member functions, as well as constructor and destructor. You should put all your code into the file <i>heapfile.C</i>.</p>
+
+<L1><B><font color="blue" size = 4.5>The Methods to be Implemented</font></B></LI> 
+
+<h4><U>Constructor and destructor</U></h4>
+
+<pre><B>HeapFile::HeapFile( const char *name, Status& returnStatus )</B></pre> Constructor. If the name already denotes a file, the file is opened; otherwise, a new empty file is created.
+ 
+<pre><B>HeapFile::~HeapFile()</B></pre> Deconstructor.
+
+<h4><U>Public methods</U></h4>
+
+<pre><B>int HeapFile::getRecCnt()</B></pre> This routine returns the number of records in this heapfile.
+
+<pre><B>Status HeapFile::insertRecord(char *recPtr, int recLen, RID& outRid)</B></pre> This routine inserts a record into the heapfile.
+
+<pre><B>Status HeapFile::deleteRecord (const RID& rid)</B></pre> This routine deletes the specified record from the heapfile.
+
+<pre><B>Status HeapFile::updateRecord (const RID& rid, char *recPtr, int recLen)</B></pre> This routine updates the specified record in the heapfile.
+
+<pre><B>Status HeapFile::getRecord (const RID& rid, char *recPtr, int& recLen)</B></pre> This routine reads record from the heapfile, returning pointer and length.
+
+<pre><B>class Scan *HeapFile::openScan(Status& status)</B></pre> This routine initiates and returns a sequential scan.
+
+<pre><B>Status HeapFile::deleteFile()</B></pre> This routine wipes out the heapfile from the database permanently. 
+
+<h4><U>Private methods</U></h4>
+
+<pre><B>Status HeapFile::newDataPage(DataPageInfo *dpinfop)</B></pre> This routine gets a new datapage from the buffer manager and initialize dpinfo.
+
+<pre><B>Status HeapFile::findDataPage(const RID& rid, PageId &rpDirPageId, HFPage *&rpdirpage, PageId &rpDataPageId,HFPage *&rpdatapage, RID &rpDataPageRid)</B></pre> This routine, as an internal HeapFile function used in getRecord and updateRecord, returns pinned directory page and pinned data page of the specified user record (rid). 
+
+<pre><B>Status allocateDirSpace(struct DataPageInfo * dpinfop, PageId &allocDirPageId, RID &allocDataPageRid)</B></pre> This routine allocates directory space for a heapfile page.
+
+<h3><U>Scan class</U></h3>
+
+<p>Have a look at the file <a href="./spaceMgr/scan.h"><i>scan.h</i></a> in <b>~/proj1/HeapFile/include</b>. It contains the interfaces for the Scan class. This class implements a "scan" object. Note that you should implement the public and private member functions, as well as constructor and destructor. You should put all your code into the file <i>scan.C</i>.</p>
+
+<L1><B><font color="blue" size = 4.5>The Methods to be Implemented</font></B></LI> 
+
+<h4><U>Constructor and destructor</U></h4>
+
+<pre><B>Scan::Scan (HeapFile *hf, Status& status)</B></pre> The constructor pins the first page in the file and initializes its private data members with the given hf.
+
+<pre><B>Scan::~Scan()</B></pre> The destructor unpins all the pages in the file.
+
+<h4><U>Public methods</U></h4>
+
+<pre><B>Status Scan::getNext(RID& rid, char *recPtr, int& recLen)</B></pre> This routine retrieves the next record in a sequential scan and returns the RID of the retrieved record.
+
+<h4><U>Private methods</U></h4>
+
+<pre><B>Status Scan::init(HeapFile *hf)</B></pre> This routine does all the constructor work.
+
+<pre><B>Status Scan::reset()</B></pre> This routine resets everything and unpin all pages.
+
+<pre><B>Status Scan::firstDataPage()</B></pre> This routine gets the first data page in the file. (It copies over data about first page.)
+
+<pre><B>Status Scan::nextDataPage()</B></pre> This routine retrieves the next data page in the file.
+
+<pre><B>Status Scan::nextDirPage()</B></pre> This routine retrieves the next directory page in the file.
+
+<h3><font color = "blue">Component Diagram</font></h3>
+<p>
+<img src="minidb_component_diagram.jpg" width=640 height=480 />
+</p>
+
+<p>
+<L1><B><font color="blue" size = 4.5>What to Turn In</font></B></LI>
+<!--<p>You are required to turn in your copy of all source files in the handin directory, this includes all the files needed to make hfpage and run the test program. The TAs should be able to go to your handin directory and type <i>make</i> and <i>hfpage</i>, to run the program. Note that you should not need to change any files other than <i>hfpage.C</i>.-->
+<p>You are required to turn in your copy of all source files in the handin directory. 
+This includes all the files needed to make and run your executables &#8212; <i>hfpage</i> and <i>heaptest</i> &#8212; in <b>~/proj1/HFPage/src/</b> and <b>~/proj1/HeapFile/src</b>, respectively. 
+We should be able to go to your handin directory, and type <i>make</i> and run the programs (<i>hfpage</i> and <i>heaptest</i>) in the HFPage and HeapFile source directories. 
+Note that you should not need to change any files other than <u><i>hfpage.C</i></u> in <b>~/proj1/HFPage/src/</b>, and <u><i>hfpage.C</i></u>, <u><i>heapfile.C</i></u> and <u><i>scan.C</i></u> in <b>~/proj1/HeapFile/src/</b>. 
+
+<p>Once you have finished your project, please tar your directory (i.e., <TT>proj1.tar</TT>) and email to Mina <TT>minakazemimanesh@email.arizona.edu</TT> the tar file.
+
+<!--CENTER>
+  <p><TT><i>turnin 560sp17-proj1 proj1.tar</i></TT></p>
+</CENTER>
+
+<br>For more details about turnin, you can also read <a href="../turnin560.html">this</a>.--> 
+
+<p>Please remember late submissions will not be accepted. Make sure to start early! 
+
+</UL>
+
+    <hr>
+<!-- Created: Thu Sep 13 23:14:18 CDT 2001 -->
+<!-- hhmts start -->
+<!--Last modified: Wed Sep 19 09:54:50 CDT 2001-->
+<!-- hhmts end -->
+	<script language="JavaScript">
+	<!-- Hide JavaScript...
+	var LastUpdated = document.lastModified;
+	document.writeln ("This page was last updated " + LastUpdated);
+	// End Hiding -->
+	</script>
+  </body>
+</html>

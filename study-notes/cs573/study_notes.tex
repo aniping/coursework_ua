@@ -1,0 +1,255 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,mdframed,
+  enumitem}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\definecolor{light-gray}{gray}{0.9}
+\definecolor{orange}{HTML}{FF7F00}
+\definecolor{light-blue}{HTML}{17F2E4}
+\definecolor{yellow2}{HTML}{F8FC02}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+
+% set of space parameters for items in a list.
+\setlist[enumerate]{topsep=3pt,itemsep=-1ex,partopsep=1ex,parsep=1ex}
+
+\title{\bf Theory of Computation\\[2ex]
+  \rm\normalsize Lecture delivered by Prof. Stephen Kobourov}
+\author{\bf Shuo Yang}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+Last updated: \date{\today}
+\end{center}
+
+\section{Introduction}
+
+In this class, we explore into different types of \emph{computational
+  model} which is an idealized computer. We start with finite automata.
+
+\section{Regular Languages}
+
+\emph{Finite Automata} are good models for computers with an extremely
+limited amount of memory.
+
+\subsection{DFA}
+
+\begin{mdframed}[backgroundcolor=yellow2] % all the definitions use
+                                         % yellow2 color
+\textbf{Formal definition of a DFA}\\
+
+A DFA is a 5-tuple $(Q, \Sigma, \delta, q_0, F)$, where
+\begin{enumerate}
+\item $Q$ is a finite set called the \emph{states},
+\item $\Sigma$ is a finite set called the \emph{alphabet},
+\item $\delta$: $Q \times \Sigma \rightarrow Q$
+\item $q_0 \in Q$ is the \emph{transition function}
+\item $F \subseteq Q$ is the \emph{set of accept states}
+\end{enumerate}
+\end{mdframed}
+
+\subsection{Intuition behind the pumping lemma for regular languages}
+
+No matter how tricky a regular language seems to be, there must be
+some repetitive pattern inside the language which can be tracked by a
+finite number of states.
+
+\section{The Church-Turing Thesis}
+
+\subsection{Turing Machine}
+
+A \emph{Turing Machine} is a much more accurate model of a general
+purpose computer. It can do everything that a real computer can do. A
+TM can end up in an \emph{accept state, reject state, or an infinite loop}.
+
+\begin{mdframed}[backgroundcolor=yellow2] % all the definitions use
+                                         % yellow2 color
+\textbf{Formal definition of a Turing Machine}\\
+
+A TM is a 7-tuple $(Q, \Sigma, \Gamma, \delta, q_0, q_accept, q_reject)$, where
+\begin{enumerate}
+\item $Q$ is the set of states,
+\item $\Sigma$ is the input alphabet not containing the blank
+  symbol \textvisiblespace,
+\item $\Gamma$ is the tape alphabet, where \textvisiblespace $\in 
+  \Gamma$ and $\Sigma \subseteq \Gamma$,
+\item $\delta: Q \times \Gamma \rightarrow Q \times \Gamma \times \{L, R\}$,
+\item $q_0 \in Q$ is the start state,
+\item $q_{accept} \in Q$ is the accept state, and
+\item $q_{reject} \in Q$ is the reject state, and $q_{accept} \neq q_{reject}$.
+
+\end{enumerate}
+\end{mdframed}
+
+The definition tells us that as a TM computes, changes occurs in the
+current state, the current tape contents, and the current head
+location. A setting of these three items is called a
+\textit{\textbf{configuration}} of the Turing Machine. Say that
+configuration $C_1$ \bemph{yields} configuration $C_2$ if the Turing
+Machine can legally go from $C_1$ to $C_2$ in a single step.\\
+
+Three special configurations:
+\begin{enumerate}
+\item \bemph{start configuration} of $M$ on input $w$ is the
+  configuration $q_0w$, which indicates that the machine is in the
+  start state $q_0$ with its head at the leftmost position on the
+  tape.
+\item \bemph{accepting configuration} the state of the configuration is
+  $q_{accept}$.
+\item \bemph{rejecting configuration} the state of the configuration is
+  $q_{reject}$.
+\end{enumerate}
+
+Both \emph{accepting configuration} and \emph{rejecting configuration}
+are \bemph{halting configurations} and do not yield further
+configurations. (\emph{If a machine does not accept a string, it
+  doesn't mean it rejects, it could either reject or enter an infinite
+loop.})\\
+
+The collection of strings that a Turing machine $M$ accepts is the
+language of M, or the language recognized by M, denoted
+$L(M)$.
+
+\begin{mdframed}[backgroundcolor=yellow2]
+\textbf{Definition}\\
+Call a language \bemph{Turing-recognizable} (a.k.a \emph{recursively
+  enumerable language}) if some Turing machine
+recognize it. (such Turing machine may halt on inputs, or loop forever.)
+
+\end{mdframed}
+
+\begin{mdframed}[backgroundcolor=yellow2]
+\textbf{Definition}\\
+Call a language \bemph{Turing-decidable} (a.k.a \emph{recursive
+  language}) or simply \bemph{decidable} if some Turing machine
+decides it. (such Turing machine always halts on all inputs.)
+
+\end{mdframed}
+
+\begin{mdframed}[backgroundcolor=light-blue]
+\textbf{Example}\\
+A Turing machine that decides the language $\{w\#w| w \in \{0,1\}^*\}$.\\
+$M$ = "On input string $w$:
+\begin{enumerate}
+\item scan from the leftmost position on the tape, cross off the first
+  unmarked symbol. Then move the head all the way to the right to the
+  corresponding position on the other side of the $\#$ to check
+  whether these two positions contain the same symbol. If they do not,
+  or if no $\#$ is found, \emph{reject}. If they do, cross off the
+  matched symbol and move the head all the way back to the leftmost position.
+\item repeat the previous step until all the symbols to the left of
+  $\#$ have been crossed off, check for any remaining symbols to the
+  right of the $\#$, if any symbols remain, \emph{reject}, otherwise,
+  \emph{accept}."
+\end{enumerate}
+
+\end{mdframed}
+
+\begin{mdframed}[backgroundcolor=light-blue]
+\textbf{Example}\\
+A Turing machine that decides the language $\{0^{2^n} | n \geq 0\}$.\\
+$M$ = "On input string $w$:
+\begin{enumerate}
+\item From left to right, cross off every other $0$, if the tape contains
+  a single $0$, \emph{accept}. Otherwise, if the number of $0's$ is
+  odd but not $1$, \emph{reject}. 
+\item Return to the left-hand end of the tape.
+\item Go to stage 1."
+\end{enumerate}
+\end{mdframed}
+
+\begin{mdframed}[backgroundcolor=light-blue]
+\textbf{Example}\\
+A Turing machine that decides the language $\{a^ib^jc^k|i \times j=k
+\text{ and } i,j,k \geq 1\}$.\\
+$M$ = "On input string $w$:
+\begin{enumerate}
+\item Scan the input from left to right to check if the input is in
+  the form of $a^+b^+c^+$ and reject if it isn't.
+\item Return the head to the left-hand end of the tape.
+\item Cross off an $a$ and scan to the right until a $b$ is
+  found. Shuttle between the $b's$ and the $c's$, crossing off one of
+  each until all $b's$ are gone. If all $c's$ have been crossed off
+  and some $b's$ remain, \emph{reject}.
+\item Restore the crossed off $b's$ and repeat stage 3 if there is
+  another $a$ to cross off. If all the $a's$ have been crossed off,
+  check whether all the $c's$ also have been crossed off. If yes,
+  \emph{accept}, otherwise, \emph{reject}."
+\end{enumerate}
+\end{mdframed}
+
+\begin{mdframed}[backgroundcolor=light-blue]
+\textbf{Example}\\
+A Turing machine that decides the language\\
+$\{\#x_1\#x_2\#\cdots\#x_l | \text{ each } x_i \in \{0,1\}^* \text{
+  and } x_i \neq x_j \text{ for each } i \neq j \}$.\\
+$M$ = "On input string $w$:
+\begin{enumerate}
+\item Place a mark on top of the leftmost symbol. If that symbol was a
+  blank, \emph{accept}. If it was a \#, continue with the next
+  stage. Otherwise, \emph{reject}.
+\item Scan right to the next \# and place a second mark on top of
+  it. If no \# is found before a blank symbol, only $x_1$ was present,
+  \emph{accept}. Otherwise, continue with the next stage.
+\item By zigzagging, compare the two strings to the right of the marked
+  \#s. If they are equal, \emph{reject}. Otherwise, continue with the
+  next stage.
+\item Move rightmost of the two marks to the next \# to the right. If
+  no \# is encountered before a blank symbol, move the leftmost mark to
+  the next \# to the right and rightmost mark to the \# after that. If
+  no \# is available for the rightmost mark, all the strings have been
+  compared, so \emph{accept}.
+\item Go to stage 3."
+\end{enumerate}
+\end{mdframed}
+
+\subsection{Variants of Turing Machine}
+
+The original Turing machine model and its reasonable variants all have
+the same power - \bemph{they recognize the same class of
+  languages}. This invariance to certain changes is called
+\bemph{robustness}. Both FAs and PDAs are somewhat robust models, but
+TMs have an as astonishing degree of robustness. The idea of proving
+two TMs are equivalent in power is simply to show that we can simulate
+one by another.
+
+\section{Midterm Summary}
+\subsection{RL, CFL}
+$\{w|\text{w has an equal number of 0s and 1s}\}$ is not a regular
+language, but is a CFL.\\
+$\{1^{n^2}\ | n \geq 0\}$ is not a regular language. Is it CFL? No. Is
+it context sensitive language (CSL)?\\
+$\{0^n1^n\ | n \geq 0\}$ is both CFL and DCFL.\\
+$\{a^ib^jc^k\ | i,j,k \geq 0 \text{ and }i=j \text{ or } i=k
+\}$ and $\{ww^R | w \in \{0,1\}^*\}$ are CFLs, but not DCFLs. \\
+$\{ww | w \in \{0,1\}^*\}$ is not CFL. \\
+$\{a^ib^jc^k\ | 0 \leq i \leq j \leq k\}$ is not a CFL. \\
+$\{a^nb^nc^n\ | 0 \leq n\}$ is not a CFL, but it is a CSL. \\
+$\{1^{p}\ | p \text{ is a prime number}\}$ is not a CFL, but is a CSL.\\
+
+The class of DCFLs is closed under complement, but \textbf{not} closed
+under union, concatenation and Kleene-star.\\
+If a language has a DPDA to recognize it, then it has an unambiguous
+grammar. \\
+The other way doesn't work! For example, $\{ww^R | w \in \{0,1\}^*\}$
+has unambiguous CFG, but it is not a DCFL.
+
+
+\section{Time Complexity}
+
+\subsection{Big O and Small O Notation}
+When the $O$ symbol occurs in an exponent:\\
+$f(n) = 2^{O(n)}$ represents an upper bound of $2^{nc}$ for some constant $c$.
+
+\end{document}

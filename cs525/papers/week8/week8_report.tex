@@ -1,0 +1,110 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX template for reading report
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools,enumitem}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS525}
+\def\ReportNo{8}
+\def\Category{Reading Report}
+\def\PaperTitle{Multicast Routing in Datagram Internetworks and
+  Extended LANS}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \Category
+
+\begin{center}
+Reading Report \#\ReportNo\\
+Paper: \PaperTitle\\
+Student: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+\vspace{1.5em}
+
+The paper mainly presents three efficient routing algorithms for
+multicasting in the Internet and extended LANs by modifying the existent
+unicast protocols such as distance vector and link-state protocols. 
+
+\vspace{1em}
+I would like to argue that the design of such multicasting algorithms
+kind of violates the end-to-end principle raised in the ``End-to-end
+arguments in system design'' paper. The end-to-end principle
+states that in a general-purpose network, application-specific
+functions ought to reside in the end hosts of a network rather than in
+intermediary nodes, given that these functions can be implemented
+completely and correctly in the end hosts. 
+
+\vspace{1em}
+First, the functionality of one-to-many or many-to-many
+delivery over the network can be implemented completely on the end
+hosts without resorting to the network itself by using repetitive
+unicasting. Doing this will put too much additional traffic to the
+network, but it simplifies the network itself and puts the
+multicast functionality to the end users, they may implement it in
+anyway they want based on the unicast, thus stick to the principle of
+end-to-end argument. 
+
+\vspace{1em}
+On the other hand, for the algorithms proposed by the paper, the
+network itself has to keep some states in order to achieve efficient
+multicasting, thus the modified distance vector or link-state
+protocols are not stateless protocol anymore. The main trade-off made
+by the paper is low delay of joining in or deliverying to a multicast
+group vs. increased cost in router state maintenance. For example,
+
+\begin{enumerate}
+\item For the basic algorithm used with LAN bridges, a router involved
+  in multicasting needs to maintain a table of multicast records and
+  periodically increment ages of multicast table records, and expire
+  them. This lowers the delay of joining and leaving a multicast
+  group, but at the cost of increased bandwidth used for periodic
+  membership reporting, which is used to construct the tables, and
+  of course, the additional state information the router maintained
+  for multicast table records.
+\item For the distance vector multicasting, a router needs to deal
+  with membership reports and keep track of a single closest
+  ``parent'' router for each link relative to a multicasting source
+  S. It needs to transit, store and process non-membership reports
+  also.
+\item For link-state multicasting, a router needs to consider
+  multicast membership as part of the link ``state'' as well.
+\end{enumerate}
+
+Thus, this paper seems to serve as a counter-argument to the end-to-end
+argument. Apparently, multicasting is important and indeed we need
+efficient and scalable multicasting protocols. However, completely
+replying on end hosts to implement multicasting does not sound as a
+good idea. We need strong and robust network design to achieve these
+goals.
+
+\end{document}

@@ -1,0 +1,683 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is LaTeX file for Homework Assignment 2
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS545}
+\def\AssignmentNo{2}
+\def\DateHandedOut{Spring, 2015}
+\def\DateDue{Feb 26}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \DateHandedOut
+
+\begin{center}
+Homework Assignment \#\AssignmentNo\\
+Due: \DateDue\\
+Student: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+
+% Enumerate through all questions.
+\begin{enumerate}
+
+\item % Problem 1
+  \underline{\textbf{Algorithm}}
+
+  \textbf{Function} $FindClosePair(A[1:n])$\\
+  \-\hspace{2em} $distance := ComputeCloseDistance(A[1:n])$\\
+  \-\hspace{2em} $(x,y) := ComputeClosePair(A[1:n], distance)$\\
+
+  \textbf{Function} $ComputeCloseDistance(A[1:n])$\\
+  \-\hspace{2em} Linearly scan the input array $A[1:n]$ from left to
+  right, find the minimum and maximum numbers, put them into variables
+  $min$ and $max$ respectively, and let\\ 
+  \-\hspace{2em} $distance := \floor{(max-min)/(n-1)}$.\\ 
+
+  \textbf{Function} $ComputeClosePair(A[1:n], distance)$\\
+  \-\hspace{2em} (1) Linearly scan the input array $A$ from left
+  to right, find the minimum and maximum numbers, put them into
+  variables $min$ and $max$ respectively.\\
+  \-\hspace{2em} (2) Divide the $n$ elements into $\floor{n/5}$ groups of $5$ elements,
+  and $\leq 1$ group of $<5$ elements.\\
+  \-\hspace{2em} (3) Find the median of each group using selection sort.\\
+  \-\hspace{2em} (4) Recursively find the median $med$ of the $\floor{n/5}$ medians
+  found in step (3).\\
+  \-\hspace{2em} (5) Partition the input array $A$ around $med$ from
+  step (4) into two subarrays $A_{low}$ and $A_{high}$ such
+  that $A_{low}$ contains all elements $\leq med$ and $A_{high}$ contains
+  all elements $\geq med$.\\ 
+  \-\hspace{2em} (6) \textbf{if} $med-min \leq distance$\\
+  \-\hspace{5.5em} \textbf{return} $(med, min)$\\
+  \-\hspace{3.75em} \textbf{if} $max-med \leq distance$\\
+  \-\hspace{5.5em} \textbf{return} $(max, med)$\\
+  \-\hspace{3.75em} \textbf{if} $n$ is odd\\
+  \-\hspace{5.75em} \textbf{if} $max-med \geq med-min$\\
+  \-\hspace{7.5em} $(x,y) := ComputeClosePair(A_{low}, distance)$\\
+  \-\hspace{5.75em} \textbf{else} \\
+  \-\hspace{7.5em} $(x,y) := ComputeClosePair(A_{high},
+  distance)$\\
+  \-\hspace{3.75em} \textbf{else} // $n$ is even\\
+  \-\hspace{5.75em} \textbf{if} $max-med-distance \geq med-min$ // med is lower
+  median \\
+  \-\hspace{7.5em} $(x,y) := ComputeClosePair(A_{low}, distance)$\\
+  \-\hspace{5.75em} \textbf{else} \\
+  \-\hspace{7.5em} $(x,y) := ComputeClosePair(A_{high}, distance)$\\
+
+  \underline{\textbf{Correctness}}\\
+  \textbf{Lemma1}: Given an unsorted array $A$ of $n$ distinct numbers, a
+  close pair always exists.
+
+  \begin{proof}
+    Prove by contradiction, that is, no such a close pair exists, this
+    means for any pair $(x,y)$ where $x > y$, we have:
+    \begin{equation}
+      x - y > \frac{1}{n-1} (max - min)
+    \end{equation}
+    Suppose we order numbers in the array $A$ in ascending order as a
+    sequence: $a_1, a_2, \cdots, a_n$ where $a_i > a_j$ if $i >
+    j$. Let $distance = \frac{1}{n-1} (max - min)$, according to the
+    assumption, we have:
+
+    \begin{equation}
+      \begin{split}
+      a_n - a_{n-1} > distance\\
+      a_{n-1} - a_{n-2} > distance\\
+      \cdots\\
+      a_3 - a_2 > distance\\
+      a_2 - a_1 > distance\\
+      \end{split}
+    \end{equation}
+
+    Summing the above equations together produces:
+    \begin{equation}
+      \begin{split}
+        a_n - a_1 &> distance \times (n-1)\\
+        & = \frac{1}{n-1} (max - min) \times (n-1)\\
+        & = max - min\\
+      \end{split}
+    \end{equation}
+    Since we have sorted the array $A$ in ascending order, this means
+    that $a_n = max$ and $a_1 = min$, therefore the above equation says that
+    $max - min > max - min$, this is clearly a contradiction, thus the lemma1
+    must be true.
+  \end{proof}
+
+  \textbf{Lemma2}: Given an unsorted array $A$ of $n$ distinct
+  numbers partitioned around its median into two subarrys $A_{low}$ and
+  $A_{high}$. $A_{low}$ contains all elements $\leq$ median and
+  $A_{high}$ contains all elements $\geq$ median. 
+  Let the maximum element be $max$, minimum element be $min$ and median
+  be $med$. A close pair must exist in $A_{low}$ if $max-med \geq
+  med-min$ (when $n$ is odd) or $max-med-distance \geq med-min$ (when $n$ is
+  even), and in $A_{high}$ otherwise. 
+
+  \begin{proof}
+    Prove by contradition.
+    If $max-med \geq med-min$ (when $n$ is odd) or $max-med-distance \geq
+    med-min$ (when $n$ is even), assume that $A_{low}$ does not contain
+    any close pairs. There are two cases to consider:
+    \begin{enumerate}
+    \item $n$ is odd.\\
+      In this case, $A_{low}$ contains $\frac{n-1}{2}+1=\frac{n+1}{2}$ elements,
+      including the $med$ itself. Applying the same method used in
+      proving Lemma1, we sort $A_{low}$ as: $a_0,
+      a_1, \cdots, a_{(n+1)/2}$ in ascending order. According to the
+      assumption, we must have,
+      \begin{equation}
+        \begin{split}
+          a_{\frac{n+1}{2}} - a_{\frac{n+1}{2}-1} > distance\\
+          \cdots\\
+          a_3 - a_2 > distance\\
+          a_2 - a_1 > distance\\
+        \end{split}
+      \end{equation}
+
+      Summing the above equations together produces:
+      \begin{equation}
+        \begin{split}
+          a_{\frac{n+1}{2}} - a_1 &> distance \times (\frac{n+1}{2}-1)\\
+          & = \frac{1}{n-1} (max - min) \times (\frac{n+1}{2}-1)\\
+          & = \frac{1}{n-1} (max - min) \times \frac{n-1}{2}\\
+          & = \frac{max - min}{2}\\
+        \end{split}
+      \end{equation}
+
+      Since $A_{low}$ is sorted in ascending order, $a_{\frac{n+1}{2}}
+      = med$ and $a_1 = min$. Thus,
+
+      \begin{equation}
+        \begin{split}
+          med - min > \frac{max - min}{2}\\
+          med > \frac{max+min}{2}
+        \end{split}
+      \end{equation}
+
+      And because $max-med \geq med-min$, we
+      have $med \leq \frac{max+min}{2}$. But we have just proved that
+      $med > \frac{max+min}{2}$, clearly it is a contradiction. Thus,
+      there must exist a close pair in $A_{low}$.
+
+    \item $n$ is even.\\
+      In this case, there are two medians, left median and right
+      median. Assume that we pick the low median.
+      $A_{low}$ contains $\frac{n}{2}$ elements,
+      including the $med$ itself. Applying the same method used in
+      proving Lemma1, we sort $A_{low}$ as: $a_1,
+      a_2, \cdots, a_{n/2}$ in ascending order. According to the
+      assumption, we must have,
+      \begin{equation}
+        \begin{split}
+          a_{\frac{n}{2}} - a_{\frac{n}{2}-1} > distance\\
+          \cdots\\
+          a_3 - a_2 > distance\\
+          a_2 - a_1 > distance\\
+        \end{split}
+      \end{equation}
+
+      Summing the above equations together produces:
+      \begin{equation}
+        \begin{split}
+          a_{\frac{n}{2}} - a_1 &> distance \times (\frac{n}{2}-1)\\
+          & = \frac{1}{n-1} (max - min) \times (\frac{n}{2}-1)\\
+          & = \frac{max - min}{2} \times \frac{n-2}{n-1}\\
+        \end{split}
+      \end{equation}
+
+      Since $A_{low}$ is sorted in ascending order, $a_{\frac{n}{2}}
+      = med$ and $a_1 = min$, we have:
+
+      \begin{equation}
+        \begin{split}
+          med - min > \frac{max - min}{2} \times \frac{n-2}{n-1}\\
+          med > \frac{max+min}{2} - \frac{max-min}{2(n-1)}
+        \end{split}
+      \end{equation}
+
+      Substituting $\frac{max-min}{n-1}$ with $distance$, we have:
+      \begin{equation}
+          med > \frac{max+min}{2} - \frac{distance}{2}
+      \end{equation}
+
+      And because $max-med-distance \geq med-min$, we
+      have $med \leq \frac{max+min}{2} - \frac{distance}{2}$. But we
+      have just proved that 
+      $med > \frac{max-min}{2} - \frac{distance}{2}$, clearly it is a
+      contradiction. Thus, there must exist a close pair in $A_{low}$.      
+    \end{enumerate}
+      The proof for the case when $max-med < med-min$ (when $n$ is odd) or
+      $max-med-distance < med-min$ (when $n$ is even) is symmetrical.
+  \end{proof}
+
+  So combining Lemma1 and Lemma2, we can conclude that our algorithm
+  can always find a pair of close elements.
+
+  \underline{\textbf{Run time analysis}}\\
+  The sub-routine $ComputeCloseDistance$ takes $\Theta(n)$ time. 
+  Let the total run time for $ComputeClosePair$ be $T(n)$ where $n$ is
+  the number of elements in the input array $A$.
+  Step (1) takes $\Theta(n)$ time, step (2) takes
+  $\Theta(n)$ time, step (3) takes $\Theta(n)$ time, step (4) takes
+  $T(\floor{(n/5)})$ time, step (5) takes $\Theta(n)$ time, step (6)
+  takes $T(n/2)$ time because for each recursive call, we reduce the
+  size of the input for the sub-problem into half, that is, either
+  recurse on lower partition or higher partition. Thus, we have:
+
+  \begin{equation}
+    \begin{split}
+      T(n) &= T(n/5) + T(n/2) + \Theta(n) \\
+      & = \Theta(n)
+    \end{split}
+  \end{equation}
+
+  By the master theorem, the total run time for $FindClosePair$ is
+  $T(n) + \Theta(n) = \Theta(n)$. 
+
+\item % problem 2
+  \underline{\textbf{Algorithm}}
+  
+  The algorithm works as the following:
+  (1) Compute the index of the median: $m = \floor{n/2}$.\\
+  (2) Find the $m_{th}$ smallest element $median$, which is also the median
+  of the input array.\\
+  (3) Partition the input array around $median$ into lower subarray and higher
+  array. \\
+  (4) recursively call on the lower sub-arrays, find it $(k/2)_{th}$
+  quantiles, then output $median$, then recursively call on the lower
+  sub-arrays, find it $(k/2)_{th}$ quantiles. Return when $k == 1$.
+
+  \underline{\textbf{Correctness}}
+
+  The algorithm first finds the median of the input array, which is
+  also the median of the $k_{th}$ quantiles. Then partition the array
+  around the median. So now we can solve two sub-problems recursively,
+  each contains at most $(k-1)/2$ order statistics of the original
+  input. Thus the recursion will eventually hit the base case where
+  $k==1$ and return back the $k_{th}$ quantiles.
+
+  \underline{\textbf{Run time analysis}}
+
+  Step (1) takes constant time, step (2) takes $\Theta(n)$ time, step
+  (3) takes $\Theta(n)$ time. The recursion has the depth of $\log {k}$.
+
+  Thus the recurrence equation is:
+  \begin{equation}
+    T(n, k) = 2T(\frac{n}{2}, \frac{k}{2}) + \Theta(n)
+  \end{equation}
+
+  By the master theorem, the run time is $\Theta(n\log {k})$.
+
+\item % problem 3
+  \underline{\textbf{Algorithm}}  
+
+  \textbf{Function} $FindSmallestInMerge(A[1:m], B[1:n], k)$\\
+  \-\hspace{2em} $i := \floor{k/2}$ \\
+  \-\hspace{2em} $j := \ceil{k/2}$ \\
+  \-\hspace{2em} \textbf{if} $k == 1$ // base case \\
+  \-\hspace{4em} \textbf{return} $min(A[1], B[1])$  \\
+  \-\hspace{2em} \textbf{if} $A[i] > b[j]$ \\
+  \-\hspace{4em} $ s_k := FindSmallestInMerge(A[1:i], B[j+1:n], i)$\\ 
+  \-\hspace{2em} \textbf{else if} $A[i] < b[j]$ \\
+  \-\hspace{4em} $ s_k := FindSmallestInMerge(A[i+1:m], B[1:j], j)$\\ 
+
+  \underline{\textbf{Correctness}}
+
+  If $A[i] > B[j]$, where $i := \floor{k/2}$ and $j := \ceil{k/2}$,
+  then in the merged array, there can be at most $k-2$ elements that
+  are $<$ $B[j]$, that is, $A[1:i-1]$ and $B[1:j-1]$. So we must have
+  the $k_{th}$ smallest element $s_k > B[j]$. On the other hand, there
+  are at least $k-1$ elements that are $< A[i]$ in the merged array,
+  that is, $A[1:i-1]$ and $B[1:j]$, thus we have $s_k \leq A[i]$.
+
+  The above analysis shows that $s_k$ can only appear in the subarray
+  $B[j+1:n]$ or $A[1:i]$. Moreover, we have thrown out $j$ elements
+  that $<$ $s_k$, thus, the problem is reduced to finding the $i_{th}$
+  smallest element in the merged array of $B[j+1:n]$ and $A[1:i]$.
+
+  In the case when $A[i] < B[j]$, the argument is symmetric.
+
+  With the above argument, we can conclude that our algorithm can find
+  the $k_{th}$ smallest element in the merge of two sorted arrays.
+
+  \underline{\textbf{Run time analysis}}
+
+  In each recursive call, we reduce the problem into half of its
+  original size, and other operations executes in constant time, thus
+  the recurrence equation is:
+
+  \begin{equation}
+    \begin{split}
+      T(k) &= T(\frac{k}{2}) + \Theta(1)
+    \end{split}
+  \end{equation}
+  By the master theorem, the run time is $\Theta(\log {k})$.
+
+\item % problem 4
+
+  \underline{\textbf{characterize the recursive structure of an
+      optimal solution}} 
+
+  For input string $S = s_1s_2 \cdots s_n$, there are three ways an
+  longest palindromic subsequence (LPS) could start or end:\\
+  \emph{Case 1:} LPS starts at $s_1$ and ends at $s_n$. In this
+  situation, $s_1=s_n$. The optimal solution must be the LPS of
+  substring $s_2 \cdots s_{n-1}$ prefixed with $s_1$ and postfixed
+  with $s_n$. If not, prefixing $s_1$ and postfixing $s_n$ to the LCS
+  of $s_2 \cdots s_{n-1}$ would yield a longer solution, which is a
+  contradiction.
+
+  \emph{Case 2:} LPS does not start at $s_1$. Then optimal solution
+  must be LPS of $s_2 \cdots s_{n}$.
+
+  \emph{Case 3:} LPS does not end at $s_n$. Then optimal solution
+  must be LPS of $s_1 \cdots s_{n-1}$.
+
+  \underline{\textbf{Derive a recurrence equation for the value of an
+      optimal solution}}
+
+  The recursive subproblem that arises is one of computing an LPS over
+  a substring of the input string $S$. Thus the subproblem can be
+  specified by the start and end index of the substring. 
+
+  So let,
+  \begin{equation}
+    L(i, j) := \text{the length of LPS of substring } s_i \cdots s_j
+  \end{equation}
+
+  So, based on the three cases, the recurrence equation can be
+  describe as:
+  \begin{equation}
+    L(i,j) := \begin{cases}
+      max \begin{cases}
+        L(i+1, j-1) + 2 \text{ \hspace{4em} // case 1} \\
+        L(i+1, j) \text{ \hspace{4em} // case 2} \\
+        L(i, j-1) \text{ \hspace{4em} // case 3} \\
+      \end{cases}\\
+      \-\hspace{6em} i \geq 1 \text{ and } j \geq 1 \text{ and } i < j \\
+
+      1 \-\hspace{5.5em} i = j \\
+      0 \-\hspace{5.5em} i > j \\
+    \end{cases}
+  \end{equation}
+
+  The solution value for the original problem is $L(1, n)$.
+
+  \underline{\textbf{Evaluate the recurrence bottom-up in a table}}
+
+  We evaluate $L(i,j)$ in a table $L[0:n, 0:n]$.
+  In general, the entry $(i,j)$ depends on the three entries $(i,
+  j-1)$, $(i+1, j-1)$ and $(i+1, j)$. So we fill in the table 
+  in diagonal-major order: first all the entries where $j-i=0$, then
+  all the entries where $j-i=1$, etc.
+
+  \textbf{Function} $EvaluateLPS(S, L, n)$\\
+  \-\hspace{2em} // fill in values at diagonal\\
+  \-\hspace{2em} \textbf{for} $k := 1$ to $n$\\
+  \-\hspace{4em} $L[k,k] := 1$ \\
+
+  \-\hspace{2em} // fill in values that rely only on diagonal values\\
+  \-\hspace{2em} \textbf{for} $i := 1$ to $n-1$\\
+  \-\hspace{4em} $j := i + 1$\\
+  \-\hspace{4em} \textbf{if} $S[i] == S[j]$\\
+  \-\hspace{6em} $L[i,j] = 2$\\
+  \-\hspace{4em} \textbf{else}\\
+  \-\hspace{6em} $L[i,j] = max(L[i,j-1], L[i+1,j])$\\
+
+  \-\hspace{2em} // fill in remaining values \\
+  \-\hspace{2em} \textbf{for} $k := 2$ to $n-1$\\
+  \-\hspace{4em} \textbf{for} $i := 1$ to $n-k$\\
+  \-\hspace{6em} $j := i + k$\\
+  \-\hspace{6em} $L[i,j] = max(L[i,j-1], L[i+1,j], L[i+1,j-1])$\\
+
+  \emph{Run time analysis:} First and second \textbf{for} loop both
+  take $\Theta(n)$ time. The third loop takes $O(n^2)$ time. So the
+  total run time is $O(n^2)$.
+
+  \underline{\textbf{Recover an optimal solution from the table of
+      solution values}}
+
+  The function $RecoverLPS$ recovers a LPS of input string $S$ that
+  starts at position $i$, ends at position $j$, given the precomputed
+  table $L$.
+
+  \textbf{Function} $RecoverLPS(S, L, i, j)$\\
+  \-\hspace{2em} \textbf{if} $i > j$\\
+  \-\hspace{4em} \textbf{return}\\
+  \-\hspace{2em} \textbf{if} $i == j$\\
+  \-\hspace{4em} output $S[i]$\\
+  \-\hspace{4em} \textbf{return}\\
+  \-\hspace{2em} \textbf{if} $S[i] == S[j]$ and $L[i,j] == L[i+1,
+    j-1]+2$  // case 1\\ 
+  \-\hspace{4em} $RecoverLCS(S, L, i+1, j-1)$\\
+  \-\hspace{4em} output $S[i]$\\
+  \-\hspace{2em} \textbf{else if} $L[i,j] == L[i+1,j]$ // case 2\\
+  \-\hspace{4em} $RecoverLPS(S, L, i+1, j)$\\
+  \-\hspace{2em} \textbf{else} $L[i,j] == L[i,j-1]$ // case 3\\
+  \-\hspace{4em} $RecoverLPS(S, L, i, j-1)$\\
+
+  \emph{Run time analysis:} each call increments $i$ or decrements
+  $j$ by 1 and spends $\Theta(1)$ time. Since we start with $i=1$
+  and $j=n$, it takes total $\Theta(n)$ time.
+
+\item % problem 5
+
+  \underline{\textbf{characterize the recursive structure of an
+      optimal solution}} 
+
+  Let the maximum independent set be $MIS$.
+  For a tree rooted at some node $r$, then there are two cases for
+  $MIS$: 
+  \emph{case 1:} $r$ is in $MIS$. Then $MIS$ cannot contain the
+  children of $r$. $MIS$ must be the sum of the optimal solutions
+  rooted at each of the grandchildren of $r$, together with $r$.
+
+  \emph{case 2:} $r$ is not in $MIS$. Then $MIS$ must be the sum of
+  optimal solutions root at each of the children of $r$. 
+
+
+  \underline{\textbf{Derive a recurrence equation for the value of an
+      optimal solution}}
+
+  The recursive subproblem that arises is one of computing an $MIS$ over
+  a sub-tree of the input tree. Thus the problem can be specified
+  by the node of the tree. Let,
+
+  \begin{equation}
+    L(v) := \text{total weights of the maximum independent set of the
+      sub-tree rooted at } v
+  \end{equation}
+
+  Our goal is to compute $L(r)$.
+  So, based on the three cases, the recurrence equation can be
+  described as:
+  \begin{equation}
+    L(v) := \begin{cases}
+      max\begin{cases}
+      \omega(v) + \sum\limits_{\text{grandchildren of } v} L(u)\\
+      \sum\limits_{\text{children of }v} L(u)\\
+      \end{cases}\\
+      \omega(v) \-\hspace{5.5em} $v$ \text{ is a leaf} \\
+    \end{cases}
+  \end{equation}
+
+
+  \underline{\textbf{Evaluate the recurrence bottom-up in a table}}
+  
+  We evaluate the table $L$ in a bottom up fashion recursively give a
+  sub-tree rooted at $v$. 
+
+  \textbf{Function} EvaluateMIS(L, v) \\
+  \-\hspace{2em} \textbf{if} $v.isLeaf$ // base case \\
+  \-\hspace{4em} $L(v) := \omega(v)$ \\
+  \-\hspace{4em} \textbf{return} $L(v)$ \\
+  \-\hspace{2em} $sumChildren := 0$ \\
+  \-\hspace{2em} $sumGrandchildren := 0$ \\
+  \-\hspace{2em} \textbf{for each} child $u$ \textbf{in} $v.children$ \\
+  \-\hspace{4em} $sumChildren := sumChildren + EvaluateMIS(L, u)$ \\
+  \-\hspace{2em} \textbf{if} $v.hasGrandchildren$ \\
+  \-\hspace{4em} \textbf{for each} grandchild $u$ \textbf{in}
+  $v.grandchildren$ \\
+  \-\hspace{6em} $sumGrandchildren := sumGrandchildren +
+  EvaluateMIS(L,u)$ \\
+  \-\hspace{4em} $L(v) := max(sumChildren, \omega(v) +
+  sumGrandchildren)$ \\
+  \-\hspace{4em} \textbf{return} $L(v)$ \\
+  \-\hspace{2em} \textbf{else} // $v$ does not have grandchildren \\
+  \-\hspace{4em} $L(v) := max(sumChildren, \omega(v)$) \\
+  \-\hspace{4em} \textbf{return} $L(v)$ \\
+
+  To compute the $MIS$ for the original input tree rooted at $r$, we
+  just need to call $EvaluteMIS(L, r)$.
+
+  \emph{Run time analysis:} there are total $n$ entries to be filled
+  in. To fill each entry $L(v)$, the algorithm only looks at the
+  children and grandchildren of $v$. So each vertex $u$ is accessed only
+  for three times: when evaluating itself, evaluating its parent and
+  when evaluating its grandparent. Since each vertex is evaluated only
+  for a constant time, thus the total run time is $\Theta(n)$.\\\\\\\\\\\\
+
+
+  \underline{\textbf{Recover an optimal solution from the table of
+      solution values}}
+
+  \textbf{Function} $RecoverMIS(L, v)$ \\
+  \-\hspace{2em} $sumChildren := 0$ \\
+  \-\hspace{2em} $sumGrandchildren := 0$ \\
+  \-\hspace{2em} \textbf{if} $v.isLeaf$ \\
+  \-\hspace{4em} output $v$ \\
+  \-\hspace{4em} \textbf{return} \\
+  \-\hspace{2em} \textbf{for each} child $u$ \textbf{in} $v.children$ \\ 
+  \-\hspace{4em} $sumChildren := sumChildren + L(u)$ \\ 
+  \-\hspace{2em} \textbf{if} $v.hasGrandchildren$ \\
+  \-\hspace{4em} \textbf{for each} grandchild $u$ \textbf{in}
+  $v.grandchildren$ \\
+  \-\hspace{6em} $sumGrandchildren := sumGrandchildren + L(u)$ \\
+  \-\hspace{4em} \textbf{if} $L(v) == \omega(v) + sumGrandchildren$ \\
+  \-\hspace{6em} output $v$ \\
+  \-\hspace{6em} \textbf{for each} grandchild $u$ \textbf{in} $v.grandchildren$\\
+  \-\hspace{8em} $RecoverMIS(L, u)$ \\
+  \-\hspace{4em} \textbf{else} \\
+  \-\hspace{6em} \textbf{for each} child $u$ \textbf{in} $v.children$ \\ 
+  \-\hspace{8em} $RecoverMIS(L, u)$\\
+  \-\hspace{2em} \textbf{else} \\
+  \-\hspace{4em} \textbf{if} $L(v) == sumChildren$ \\
+  \-\hspace{6em} \textbf{for each} child $u$ \textbf{in} $v.children$ \\ 
+  \-\hspace{8em} $RecoverMIS(L, u)$ \\
+  \-\hspace{4em} \textbf{else} \\
+  \-\hspace{6em} output $v$ \\
+  \-\hspace{6em} \textbf{return} \\
+
+  The procedure recovers a MIS of the sub-tree rooted at vertex $v$. So
+  to recover a MIS for the original input tree rooted at $r$, just
+  call $RecoverMIS(L, r)$. 
+
+  \emph{Run time analysis:} similar with the analysis of the
+  evaluation function, this time each table entry $L(v)$ will be
+  looked up for at most three times, that is, when looking at its
+  grandparent, its parent and itself. There are total $n$ entries,
+  thus the run time is $\Theta(n)$.
+
+\item % problem 6
+  \underline{\textbf{characterize the recursive structure of an
+      optimal solution}} 
+
+  After having dialed a prefix of the input digits $A$, the two
+  figures can be only in constant number of configurations, which is,
+  $\frac{12!}{(12-2)!} = 132$. So the optimal solution for dialing $n$
+  digits must be the
+  optimal solution for dialing the $1_{st}$ digit combining the optimal
+  solution for dialing the remaining $n-1$ digits. (So the optimal solution
+  for dialing the remaining $n-1$ digits must be the optimal solution
+  for dialing the $2_{nd}$ combining the optimal solution for dialing
+  the remaining $n-2$ digits). This defines the recursive structure of
+  an optimal solution.
+
+  \underline{\textbf{Derive a recurrence equation for the value of an
+      optimal solution}}
+
+  Assume right finger's initial position is \#, and left finger's
+  initial position is *. 
+
+  Given a $n$-digit telephone number $A=a_1a_2 \cdots a_n$, lets 
+  define: 
+  \begin{equation}
+    \begin{split}
+    distance(i, j) &= \text{ Euclidean distance between digit $i$ and
+      digit } j.\\
+    \text{and},\\
+    distance(i, \#) &= \text{ Euclidean distance between digit $i$ and \# }\\
+    \text{and},\\
+    distance(i, *) &= \text{ Euclidean distance between digit $i$ and
+      *}
+    \end{split}
+  \end{equation}
+
+  and, $L(i,j) := $ minimum cost to type digit $i$ with left finger,
+  and having right finger at digit $j$($j=0$ if right finger is at
+  initial position \#),\\
+  and, $R(i,j) := $ minimum cost to type digit $i$ with right finger,
+  and having left finger at digit $j$($j=0$ if left finger is at
+  initial position *).
+
+  When $i=0$, both left and right fingers are at their initial positions.
+
+  So, according the recursive structure of the optimal solution, we
+  can compute $L(i+1, j)$ based on $L(i,j)$ and $R(i,j)$. This gives
+  us the recurrence equation as follows:
+  \begin{equation}
+    L(i+1,j) := \begin{cases}
+      L(i,j) + distance(i,i+1) \-\hspace{2em} 0 < i < n \text{ and
+      } 0 \leq j < n \text{ and } i > j \\ 
+      \min\limits_{0 \leq j' < i}(R(i,j') + distance(j',i+1)) \-\hspace{2em} i = j \text{ and }
+      0 \leq j' < n \text{ and } i > j' \\
+      distance(1, *) \-\hspace{4.5em} i = 0, j = 0\\
+      0 \-\hspace{10em} i < 0, j < 0
+    \end{cases}
+  \end{equation}
+
+  In the above equation, $R(i,j') + distance(j',i+1)$ means when the
+  right finger is also at digit-$i$, and with left finger pointing at
+  digit-$j'$, so in this case, we need to also consider moving left
+  finger from $j'$ to $i+1$, which also yields a valid $L(i+1,j)$. So
+  we take the minimum of these two possible cases. Also note we
+  consider the case when $i=j$ separately because in this case
+  $L(i,j)$ is not valid because having two fingers typing one digit
+  twice does not produce the minimum distance.
+
+  The recurrence equation for $R(i,j)$ is similar:
+  \begin{equation}
+    R(i+1,j) := \begin{cases}
+      R(i,j) + distance(i,i+1) \-\hspace{2em} 0 < i < n \text{ and } 0 \leq j < n
+      \text{ and } i > j \\ 
+      \min\limits_{0 \leq j' < i}(L(i,j') + distance(j',i+1)) \-\hspace{2em} i = j \text{ and } 0
+      \leq j' < n \text{ and } i > j'\\ 
+      distance(1, \#) \-\hspace{4.5em} i = 0, j = 0\\
+      0 \-\hspace{10em} i < 0, j < 0
+    \end{cases}
+  \end{equation}
+
+
+  \underline{\textbf{Evaluate the recurrence bottom-up in a table}}
+ 
+  Based on the recurrence equation, the following function is used to
+  evaluate the recurrence for the table $L[0:n, 0:n]$ and $R[0:n, 0:n]$.\\\\\\\\\\\\\\\\\\
+
+  \textbf{Function} EvaluateTFD(A, L, R) \\
+  \-\hspace{2em} $L(1,0) := distance(1, *)$ \\
+  \-\hspace{2em} $R(1,0) := distance(1, \#)$ \\
+  \-\hspace{2em} \textbf{for} $i := 2$ to $n$ \\
+  \-\hspace{4em} \textbf{for} $j := 0$ to $i-2$ \\
+  \-\hspace{6em} $L(i,j) := L(i-1, j) + distance(i-1, i)$ \\
+  \-\hspace{6em} $R(i,j) := R(i-1, j) + distance(i-1, i)$ \\
+  \-\hspace{4em} $j := i - 1$ \\
+  \-\hspace{4em} $minR := \infty$ \\
+  \-\hspace{4em} \textbf{for} $j' := 0$ to $j-1$ \\
+  \-\hspace{6em} minR = $min(R(i-1, j'), minR)$ \\
+  \-\hspace{4em} $L(i-1,j) := minR$ \\
+  \-\hspace{4em} $minL := \infty$ \\
+  \-\hspace{4em} \textbf{for} $j' := 0$ to $j-1$ \\
+  \-\hspace{6em} minL = $min(L(i-1, j'), minL)$ \\
+  \-\hspace{4em} $R(i-1,j) := minL$ \\
+
+  \emph{Run time:} the run time for filling $L$ and $R$ takes $O(n^2)$ time.
+
+  \underline{\textbf{Recover an optimal solution from the table of
+      solution values}}
+  
+  To get the minimum distance traveled, just take the minimum one
+  between $L(n,x)$ and $R(n,y)$ where $0 \leq x,y < n$. It takes
+  $\Theta(n)$ time.
+
+\end{enumerate}
+\end{document}

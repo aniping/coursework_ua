@@ -1,0 +1,3 @@
+q2r1 = select (employee) (departname="Marketing")
+q2r2 = project (q2r1) (empfname)
+display q2r2

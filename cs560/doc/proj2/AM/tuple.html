@@ -1,0 +1,142 @@
+
+<!-- saved from url=(0066)http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/AM/tuple.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Tuple Representation</title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+<!--<body background="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/gif/parch.jpg" bgcolor="#FFdead" text="#440000" li="" nk="#339966" vlink="#CC0000" alink="#0000CC">-->
+<body bgcolor="#FFFFFF" text="#440000" li="" nk="#339966" vlink="#CC0000" alink="#0000CC">
+<!--
+<table border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td>
+
+<p align="center">&nbsp;</p>
+<table border="0" width="100%">
+  <tbody><tr>
+    <td width="12%"><a href="./tuple_files/book3ed.jpg"><img border="0" src="./tuple_files/book3ed.jpg" width="80" height="106"></a></td>
+    <td width="88%"><h1 align="center"><font size="6"><strong>Database Management Systems</strong></font></h1>
+      <p align="center">by <a href="http://www.cs.wisc.edu/~raghu">Raghu
+      Ramakrishnan</a> and <a href="http://www.cs.cornell.edu/johannes">Johannes
+      Gehrke</a></p>
+      <p align="center">
+</p>
+    </td>
+  </tr>
+</tbody></table>
+<p align="center"><img border="0" src="./tuple_files/hline.gif" align="left" width="800" height="2"></p>
+
+</td></tr></tbody></table>
+-->
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tbody>
+			<tr>
+				<td>
+					<p align="center">&nbsp;</p>
+					<table border="0" width="100%">
+					  <tbody>
+						<tr>
+						    <td width="88%">
+							<p align="left"><img border="0" src="../../uadcs.gif" align="center"></p>
+							<h1 align="center"><font size="6"><strong>Spring 17</strong></font></h1>
+							<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+							<!--<p align="center"><font size="4"><a href="http://www.cs.arizona.edu" target="_blank">Department of Computer Science</a></font></p>
+							<p align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</a></font></p>-->
+							<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+							<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+							<!--<h3 align="center"><font size="4">Department of <a href="http://www.cs.arizona.edu" target="_blank">Computer Science</a></font></h3>
+							<h3 align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</font></h3>
+							<h3 align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></h3>-->
+						     	 <!--<p align="center">
+						<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/index.html" target="" style="{text-decoration: none;}">Database&nbsp;Management&nbsp;Systems&nbsp;(3rd&nbsp;Edition)</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.dist.html" target="" style="{text-decoration: none;}">The&nbsp;Minibase&nbsp;Distribution</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/single_user.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Overview</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/project.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Modules</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.notice.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Terms&nbsp;and&nbsp;Agreement</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/history.html" target="" style="{text-decoration: none;}">Minibase&nbsp;History</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minidoc.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Documentation</a>]</nobr></p>-->
+							</td>
+ 						</tr>
+					  </tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+<br>
+
+<table dir="ltr" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><!--msnavigation--><td valign="top">
+<h1>Tuples</h1>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<p>
+</p><h1>Introduction </h1>
+Each record in a relation is a collection of bytes that
+is cast as an object of type <em>Tuple</em>.  
+Only implementors of access methods, heap files and relational operators
+need to worry about how the bytes are utilized .
+Others can treat them as just a collection of bytes.  
+<p>
+<i>Tuples</i> may have attributes of three types: <b>strings</b> (up to 255 characters),
+<b>integers</b>, and <b>real</b> numbers (floats, in C++).
+</p><p>
+Because padding of bytes is needed to align integers and floats,
+the exact number of bytes in a <i>Tuple</i> is not known ahead of time.
+When tuples are created, a large number of bytes must be allocated.
+Then the attributes list (for example: string, int, float) 
+is passed to the tuple and the tuple is constructed.  During the 
+<i>Tuple</i> construction, padding is performed and the actual size of the 
+<i>Tuple</i> with those attributes is determined.
+</p><p>
+For our (string,int,float) example tuple, with the maximum length of the
+string being 5, and the architecture having 4-byte ints and floats, both
+requiring 4-byte alignment, the tuple internals would look like:
+</p><p>
+
+</p><center>
+<table border="">
+
+<caption align="bottom">Tuple Representation In Memory
+</caption>
+
+<tbody><tr>
+    <th>string</th>
+    <th>padding</th>
+    <th>int</th>
+    <th>float</th>
+</tr>
+
+<tr>
+    <td>5 bytes</td>
+    <td>3 bytes</td>
+    <td>4 bytes</td>
+    <td>4 bytes</td>
+</tr>
+
+</tbody></table>
+</center>
+
+<p>
+The padding was added after the string to allow the int field to be
+placed at an offset that is a multiple of 4, as required by the
+example machine's architecture.
+
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+
+</p><h2>Design Decisions</h2>
+Padding was chosen over copying for no particular reason.  The amount
+of space wasted due to padding may not offset the time that is needed
+to copy the data into aligned space when it is needed; thus, a variant
+that uses copying could be used instead.
+<p>
+In Minibase, a tuple must fit on a single page.
+</p><p>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+</p><p>
+
+Click here for the <a href="tuple.h"><b>public interface</b></a>.
+
+
+</p><p>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+</p><p>
+<b><a href="https://www2.cs.arizona.edu/classes/cs560/spring17/project/project.html">Back to the List of Components</a></b><br>
+<b><a href="https://www2.cs.arizona.edu/classes/cs560/spring17/project/miniusage.html">Back to the Minibase Home Page</a></b><br>
+</p><p>
+
+<!--msnavigation--></p></td></tr><!--msnavigation--></tbody></table>
+
+</td></tr></tbody></table></body></html>

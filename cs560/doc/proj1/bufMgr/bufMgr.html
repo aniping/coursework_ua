@@ -1,0 +1,109 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Buffer Manager</title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+<body><!--msnavigation-->
+
+<!--<table border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td>
+
+<p align="center">&nbsp;</p>
+<table border="0" width="100%">
+  <tbody><tr>
+    <td width="12%"><a href="./bufMgr_files/book3ed.jpg"><img border="0" src="./bufMgr_files/book3ed.jpg" width="80" height="106"></a></td>
+    <td width="88%"><h1 align="center"><font size="6"><strong>Database Management Systems</strong></font></h1>
+      <p align="center">by <a href="http://www.cs.wisc.edu/~raghu">Raghu
+      Ramakrishnan</a> and <a href="http://www.cs.cornell.edu/johannes">Johannes
+      Gehrke</a></p>
+      <p align="center">
+<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/index.html" target="" style="{text-decoration: none;}">Database&nbsp;Management&nbsp;Systems&nbsp;(3rd&nbsp;Edition)</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.dist.html" target="" style="{text-decoration: none;}">The&nbsp;Minibase&nbsp;Distribution</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/single_user.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Overview</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/project.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Modules</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.notice.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Terms&nbsp;and&nbsp;Agreement</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/history.html" target="" style="{text-decoration: none;}">Minibase&nbsp;History</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minidoc.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Documentation</a>]</nobr></p>
+    </td>
+  </tr>
+</tbody></table>
+-->
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tbody>
+			<tr>
+				<td>
+					<p align="center">&nbsp;</p>
+					<table border="0" width="100%">
+					  <tbody>
+						<tr>
+						    <td width="88%">
+							<p align="left"><img border="0" src="../../uadcs.gif" align="center"></p>
+							<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+							<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+							<!--<p align="center"><font size="4"><a href="http://www.cs.arizona.edu" target="_blank">Department of Computer Science</a></font></p>
+							<p align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</a></font></p>-->
+							<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+							<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+							<!--<h3 align="center"><font size="4">Department of <a href="http://www.cs.arizona.edu" target="_blank">Computer Science</a></font></h3>
+							<h3 align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</font></h3>
+							<h3 align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></h3>-->
+						     	 <!--<p align="center">
+						<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/index.html" target="" style="{text-decoration: none;}">Database&nbsp;Management&nbsp;Systems&nbsp;(3rd&nbsp;Edition)</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.dist.html" target="" style="{text-decoration: none;}">The&nbsp;Minibase&nbsp;Distribution</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/single_user.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Overview</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/project.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Modules</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minibase.notice.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Terms&nbsp;and&nbsp;Agreement</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/intro/history.html" target="" style="{text-decoration: none;}">Minibase&nbsp;History</a>]</nobr>&nbsp;<nobr>[<a href="http://pages.cs.wisc.edu/~dbbook/openAccess/Minibase/minidoc.html" target="" style="{text-decoration: none;}">Minibase&nbsp;Documentation</a>]</nobr></p>-->
+							</td>
+ 						</tr>
+					  </tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+</td></tr><!--msnavigation--></tbody></table><!--msnavigation--><table dir="ltr" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><!--msnavigation--><td valign="top">
+<p>&nbsp;</p>
+<h1>Buffer Manager</h1>
+
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<h2> Introduction </h2>
+<p>
+The buffer manager reads disk pages into a main memory page as needed.
+The collection of main memory pages (called <em>frames</em>) 
+used by the buffer manager for this
+purpose is called the <em>buffer pool</em>.  
+This is just an array of <b>Page</b> objects.
+The buffer manager is used by (the code for)
+access methods, heap files, and relational operators
+to read / write /allocate / de-allocate pages.  
+The Buffer Manager makes calls to the underlying DB class object,
+which actually performs these functions 
+on disk pages.
+</p><p>
+Replacement policies for the buffer manager can be changed easily
+at compile time.
+</p><h2><p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p></h2>
+<h2>Design Decisions</h2>
+A hash table is used to figure out what page frame a given disk page
+(i.e., with a given pageId) occupies.  
+A buffer descriptor object is associated with every
+page frame in the buffer pool.  It contains a dirty bit, the page number,
+and the pin count for the page occupying that frame.
+<p>
+When a page is requested, the buffer manager brings it in and pins it.
+The buffer manager does <strong>not</strong> keep track of all the pages
+that have been pinned by a transaction.  It is up to the various  
+components (that call the buffer manager)
+to make sure that all pinned pages are subsequently unpinned.
+</p><p>
+See the textbook for a more detailed description of the buffer manager.
+
+</p><p>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+</p><p>
+
+Click here for the <a href="buf.h"><b>public interface</b></a>.
+</p>
+<p align="left"><img border="0" src="../../hline.gif" align="center" width="1024" height="2"></p>
+<p>
+<a href="../../project.html">Back to the List of Components</a><br>
+<a href="../../minibase.html">Back to the Minibase Home Page</a><br>
+<!--A HREF="report.html"-->
+<!--764 Report</A-->
+</p><p>
+
+
+<!--msnavigation--></p></td></tr><!--msnavigation--></tbody></table>
+
+
+</body></html>

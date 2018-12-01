@@ -1,0 +1,76 @@
+(gdb)
+(gdb) break strncmp
+Breakpoint 1 at 0x400530
+(gdb) where
+No stack.
+(gdb) run 23 45
+Starting program: /p2/hs/shuoyang/cs566/assignment2-B-2/Shuo_Yang/challenge 23 45
+Please enter password:89
+
+Breakpoint 1, __strncmp_sse42 () at ../sysdeps/x86_64/multiarch/strcmp-sse42.S:123
+123	   ../sysdeps/x86_64/multiarch/strcmp-sse42.S: No such file or directory.
+(gdb) where
+#0  __strncmp_sse42 () at ../sysdeps/x86_64/multiarch/strcmp-sse42.S:123
+#1  0x0000000000400c7d in SECRET ()
+#2  0x0000000000401cea in main ()
+(gdb) print $rdx
+$1 = 100
+(gdb) print $rdi
+$2 = 140737488348784
+(gdb) print $rsi
+$3 = 6417335
+(gdb) x/d 6417335
+0x61ebb7 <encodeStrings_litStr2>:	1919116659
+(gdb) x/s 6417335
+0x61ebb7 <encodeStrings_litStr2>:	 "secret"
+(gdb) print $rdx
+$4 = 100
+(gdb) print $rcx
+$5 = 6417335
+(gdb) x/d 140737488348784
+0x7fffffffe670:	56
+(gdb) x/x 140737488348784
+0x7fffffffe670:	0x38
+(gdb) x/s 140737488348784
+0x7fffffffe670:	 "89"
+
+shuoyang@lectura:~/cs566/assignment2-B-2/Shuo_Yang$ ltrace -c challenge 23 45
+Please enter password:secret
+% time     seconds  usecs/call     calls      function
+------ ----------- ----------- --------- --------------------
+ 99.98    3.248586     3248586         1 scanf
+ 0.01     0.000239         239         1 printf
+ 0.00     0.000158          79         2 strtoul
+ 0.00     0.000113         113         1 strncmp
+ ------ ----------- ----------- --------- --------------------
+ 100.00   3.249096                     5 total
+
+(gdb) set {unsigned char}0x401539 = 0x94
+(gdb) quit
+
+shuoyang@lectura:~/cs566/assignment2-B-2/Shuo_Yang$ objdump -x challenge.bak | egrep 'text|Name'
+Idx Name          Size      VMA               LMA               File off  Algn
+ 12 .text         00001824  00000000004005a0  00000000004005a0  000005a0  2**4
+ 00000000004005a0 l    d  .text		      0000000000000000              .text
+ 00000000004005cc l     F .text		      0000000000000000              call_gmon_start
+ 00000000004005f0 l     F .text		      0000000000000000              deregister_tm_clones
+ 0000000000400630 l     F .text		      0000000000000000              register_tm_clones
+ 0000000000400670 l     F .text		      0000000000000000              __do_global_dtors_aux
+ 0000000000400690 l     F .text		      0000000000000000              frame_dummy
+ 0000000000401dc0 g     F .text		      0000000000000002              __libc_csu_fini
+ 00000000004009bc g     F .text		      000000000000123f              SECRET
+ 00000000004006ce g     F .text		      0000000000000007              megaInit
+ 00000000004006dc g     F .text		      0000000000000007              obfencodeStrings_litStr2_i$nit
+ 00000000004006e3 g     F .text		      00000000000002d2              _obf_3_stringEncoder
+ 00000000004006b8 g     F .text		      0000000000000016              obfmegaInit
+ 0000000000401d30 g     F .text		      0000000000000089              __libc_csu_init
+ 00000000004005a0 g     F .text		      0000000000000000              _start
+ 00000000004009b5 g     F .text		      0000000000000007              obfencodeStrings_litStr0_i$nit
+ 0000000000401bfb g     F .text		      0000000000000134              main
+ 00000000004006d5 g     F .text		      0000000000000007              obfencodeStrings_litStr1_i$nit
+ shuoyang@lectura:~/cs566/assignment2-B-2/Shuo_Yang$ objdump -x challenge.bak | egrep 'rodata|Name'
+ Idx Name          Size      VMA               LMA               File off  Algn
+ 14 .rodata       000000a2  0000000000401dd0  0000000000401dd0  00001dd0  2**3
+ 0000000000401dd0 l    d  .rodata	       0000000000000000              .rodata
+ 0000000000401dd0 g     O .rodata	       0000000000000004              _IO_stdin_used
+       

@@ -1,0 +1,205 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is LaTeX file for Homework Assignment 1 of CS460
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS560}
+\def\AssignmentNo{1}
+\def\DateHandedOut{Spring, 2016}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \DateHandedOut
+
+\begin{center}
+Homework \#\AssignmentNo\\
+\Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+
+% Enumerate through all questions.
+\begin{enumerate}
+\item Since the block size is 16KB and record size is 32 Bytes, the
+  number of records in each block $R$ = 16KB/32Bytes = 500. Since
+  there are total number of records 300 million, thus the total number
+  of blocks $B = 300 * 10^{6} / R = 6 * 10^5$. Assume that $F=100$,
+  which is the number of index entries in a non-leaf B-tree node.
+\begin{enumerate}
+\item \emph{Cost}: $BD_s = 6 * 10^5 * 1ms = 600s$\\
+  \emph{Explanation}: we must sequentially retrieve each of the $B$
+  blocks and it takes $D_s$ time to read a block.
+\item \emph{Cost}: $0.5BD_s = 0.5 * 6 * 10^5 * 1ms = 300s$\\
+  \emph{Explanation}: On average, we must sequentially scan half the
+  file, assuming that the record exists and the distribution of values
+  in the search fields is uniform.
+\item \emph{Cost}: $BD_s = 6 * 10^5 * 1ms = 600s$\\
+  \emph{Explanation}: we must sequentially scan the entire file since
+  qualifying records could appear anywhere in the file.
+\item \emph{Cost}: $D_r + D_s = 10ms + 1ms = 11ms$\\
+  \emph{Explanation}: assuming that records are always inserted at the
+  end of the file. It takes one random read to fetch the last block
+  into the memory, insert the record, and write the block back
+  (sequential write).
+\item \emph{Cost}: cost of search + $D_s$ = $0.5BD_s + D_s$ = $300s +
+  1ms \approx 300s$\\
+  \emph{Explanation}: we must find the block that contains the record,
+  remove it from the block and write (sequential write) the modified
+  block back, assuming that we don't compact the file to reclaim the
+  free space created by deletion.
+
+\item \emph{Cost}: $BD_s = 6 * 10^5 * 1ms = 600s$\\
+  \emph{Explanation}: we must sequentially retrieve each of the $B$
+  blocks and it takes $D_s$ time to read a block.
+\item \emph{Cost}: $D_r * \log_2B = 10ms * \log_2(6*10^5) \approx
+  190ms$\\
+  \emph{Explanation}: we can locate the block containing the desired
+  record with a binary search in $\log_2B$ steps, each step takes a
+  random read.
+\item Assume that the number of blocks with match records is 10.\\
+  \emph{Cost}: $D_r * \log_2B + D_s *$ number of blocks with match
+  records = $10ms * \log_2(6*10^5) + 1ms * 10 \approx 200ms$\\
+  \emph{Explanation}: the first record that satisfies the selection is
+  located as for search for equality. Subsequently, data blocks are
+  sequentially retrieved until a record is found that does not satisfy
+  range selection.
+\item \emph{Cost}: cost of equality search + $BD_s$ = $D_r * \log_2B +
+  BD_s = 190ms + 600s = 600.19s$\\
+  \emph{Explanation}: we must first find the correct position in the
+  file to insert, insert the record, then fetch and rewrite all the
+  subsequent blocks, because all the old records are shifted by one
+  slot, assuming that the file has no empty slot. On average, we
+  assume that the inserted record belongs the middle of the
+  file. Therefore, we must read the latter half of the file and write
+  it back after adding the new record.
+\item \emph{Cost}: cost of equality search + $BD_s$ = $D_r * \log_2B +
+  BD_s = 190ms + 600s = 600.19s$\\
+  \emph{Explanation}: Same reason as for the insertion.
+
+\item \emph{Cost}: $1.5BD_s = 1.5 * 6 * 10^5 * 1ms = 900s$\\
+  \emph{Explanation}: all data blocks must be retrieved and we assume
+  67\% percent occupancy.
+\item \emph{Cost}: $D_r\log_F(1.5B) = 10ms * \log_{100}(1.5*6*10^5)
+  \approx 30ms$\\
+  \emph{Explanation}: we can locate the block containing the desired
+  record in $log_F(1.5B)$ steps, that is, by fetching all pages from
+  root to the appropriate leaf. Each fetching is a random disk access.
+\item \emph{Cost}: $D_r\log_F(1.5B)$ + $D_s * $ number of blocks with
+  match records = $10ms * \log_{100}(1.5*6*10^5) + 1ms * 10 \approx =
+  40ms$
+  \emph{Explanation}: the first record that satisfies the range
+  selection is located as it is for equality search. Subsequently,
+  data pages are fetched sequentially.
+\item \emph{Cost}: cost of equality search + $D_s \approx 31ms$.\\
+  \emph{Explanation}: we first use the equality search to locate the
+  leaf page that the new record should be inserted, then add the new
+  record and write it back. We assume that the leaf page has
+  sufficient space for the new record.
+\item \emph{Cost}: cost of equality search + $D_s \approx 31ms$.\\
+  \emph{Explanation}: Same reason as it is for insertion.
+
+\item \emph{Cost}: $0.15 * BD_s + BD_rR \approx 3 * 10^6s$
+  \emph{Explanation}: it cost $0.15BD_s$ to fetch all leaf pages of the
+  tree, then it takes one I/O operation to fetch each record for each
+  data entry in the index because the index is unclustered and each
+  data entry on a leaf page could point to a different page in the
+  file. Each such an operation is a random read.
+\item \emph{Cost}: $D_r(1+\log_F 0.15B) \approx 35ms$\\
+  \emph{Explanation}: we can locate the page with the desired data
+  entry within $\log_F 0.15B$ steps, each requires a random access,
+  then we need another random disk I/O to 
+  fetch the page containing actual desired record.
+\item \emph{Cost}: $D_r(\log_F 0.15B + $ number of matching
+  records $) \approx 1025ms$, assuming that number of matching
+  records is 100\\
+  \emph{Explanation}: the first record that satisfies the selection is
+  located as it is for search with equality, subsequently, data
+  entries are sequentially retrieved, for each matching data entry, it
+  incurs one random disk I/O.
+\item \emph{Cost}: $D_r + D_s + $ cost of equality search $\approx 46ms$
+  \emph{Explanation}: we first insert the record in the file, at the
+  cost of one random read and one sequential write, and we also need
+  to update the index to insert a new data entry.
+\item \emph{Cost}: $D_r + D_s + $ cost of equality search $\approx 46ms$
+  \emph{Explanation}: we first locate the data record in the file and
+  the data entry in the index, and then we need to write out the
+  modified pages in the index and the date file.
+
+\item \emph{Cost}: $0.125 * BD_s + BD_rR \approx 3 * 10^6s$
+  \emph{Explanation}: it cost $0.125BD_s$ to fetch all data entries,
+  then it takes one I/O operation to fetch each record for each
+  data entry in the index because the index is unclustered. Each such
+  an operation is a random read.
+
+\item \emph{Cost}: $2D_r = 20ms$
+  \emph{Explanation}: it takes one random disk access to fetch the
+  hash bucket and another random disk access to fetch the data record
+  in the file.
+
+\item \emph{Cost}: $BD_s = 6 * 10^5 * 1ms = 600s$
+  \emph{Explanation}: the hash structure offers no help, so we have to
+  sequentially scan the entire file.
+
+\item \emph{Cost}: $D_r + D_s + $ cost of equality search $\approx 31ms$
+  \emph{Explanation}: we first insert the record in the file, at the
+  cost of one random read and one sequential write, and we also need
+  to update the index to insert a new data entry.
+\item \emph{Cost}: $D_r + D_s + $ cost of equality search $\approx 31ms$
+  \emph{Explanation}: we first locate the data record in the file and
+  the data entry in the index, and then we need to write out the
+  modified pages in the index and the date file.
+\end{enumerate}
+
+\item 
+\begin{enumerate}
+\item number of sectors: 5,860,533,168
+\item number of platters: 8
+\item number of tracks: 93024336 (calculated as: number of
+  sectors/sectors per track(63))
+\item sector size: 512 Bytes
+\item capacity: 3000GB (3TB)
+\item amount of space for error correction: cannot find
+\item seek time: $<$12ms typical
+\item rotation delay: 5.1ms
+\item transfer time: it takes 1 second to transfer the maximum of
+  600MB data
+\item minimum random read time: cannot find
+\item minimum sequential read time: cannot find
+\item maximum random write time: cannot find
+\item maximum sequential write time: cannot find
+\end{enumerate}
+manufacturer name: Seagate\\
+part number: ST3000DM003\\
+source: \url{http://archive.benchmarkreviews.com/?option=com_content&task=view&id=1071&Itemid=60}
+
+\end{enumerate}
+\end{document}

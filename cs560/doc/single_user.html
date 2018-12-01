@@ -1,0 +1,146 @@
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Minibase Overview</title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+<body link="#339966" vlink="#CC0000" alink="#0000CC"><!--msnavigation-->
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td>
+				<p align="center">&nbsp;</p>
+				<table border="0" width="100%">
+				  <tbody>
+					<tr>
+					    <td width="88%">
+						<p align="left"><img border="0" src="uadcs.gif" align="center"></p>
+						<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+						<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+						<!--<p align="center"><font size="4"><a href="http://www.cs.arizona.edu" target="_blank">Department of Computer Science</a></font></p>
+						<p align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</a></font></p>-->
+						<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+						<!--<p align="center"><font size="4">Grader: <a href="mailto:yksuh@cs.arizona.edu">Young-K. Suh</a></font></p>-->
+						<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+						<!--<h3 align="center"><font size="4">Department of <a href="http://www.cs.arizona.edu" target="_blank">Computer Science</a></font></h3>
+						<h3 align="center"><font size="4"><a href="http://www.arizona.edu" target="_blank">University of Arizona</font></h3>
+						<h3 align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></h3>-->
+						</td>
+					</tr>
+				  </tbody>
+				</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<center>
+<h1>Overview of Single-User Minibase</h1>
+</center>
+
+<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+<p>
+
+It is easiest to understand Minibase in terms of how a query is processed.
+A query is first parsed and optimized to obtain an evaluation plan.
+The evaluation plan is structured as a tree of iterators, each of which
+supports a ``get-next-tuple'' interface, and corresponds typically to
+a relational algebra operator.  Execution is initiated by
+calling get-next-tuple at the root of the plan tree, which successively
+generates get-next-tuple calls on descendant nodes.  
+Execution consists essentially of 
+a data-driven loop of such calls until all the
+input tuples have been processed.  This is described below in more detail.
+(Only single-user Minibase is covered in this overview---in fact, only
+single-user Minibase is available for now, and most likely, for a while yet!)
+</p><p>
+
+</p><center>
+<a href="query.gif"><img src="query.gif" width="586" height="145"></a>
+</center>
+
+<p>
+<!--<a href="query.html">--><b>Parser and Optimizer:</b></a>  These 
+modules take an SQL query and find the best plan for evaluating it.
+The optimizer is similar to the one used in System R (and subsequently 
+in most commercial relational database systems).  In optimizing
+a query, the optimizer considers information in the catalog about
+relations and indexes.  It can read catalog information from a Unix file, 
+and thus the parser/optimizer can be used in a stand-alone mode, independent of
+the rest of Minibase (say, for optimizer related exercises).
+</p><p>
+
+<!--<a href="planner.html">--><b>Execution Planner:</b></a> This 
+module takes the plan tree produced by the optimizer, and creates
+a run-time data structure.  This structure is essentially a
+tree of ``iterators'', each of which supports a ``get-next-tuple''
+interface.  Tuples are returned in response to get-next-tuple calls
+by copying them into dynamically allocated main memory (not the buffer pool).
+</p><p>
+The figure below shows details of iterator trees and the Minibase
+code that they call.  
+</p><p>
+</p><center>
+<a href="plan.gif"><img src="plan.gif" width="541" height="606"></a>
+</center>
+<p>
+<b>Main loop:</b> Execution is 
+triggered by ``pulling'' on the root of
+the tree with a get-next-tuple call.
+This results in similar calls to iterators lower in the tree.
+Leaf level iterators retrieve tuples from a relation (perhaps
+using an index), and intermediate level iterators in the tree
+correspond to joins.  Selections and projections are ``piggy-backed''
+onto these iterators.
+More information is available on each of these components:
+</p><p>
+<!--<a href="iterator.html">--><b>Iterators</b></a>  
+A ``get-next-tuple'' interface for file scans, index scans and joins.
+</p><p>
+<!--<a href="joins.html">--><b>Join Methods</b></a>  Nested loops,
+sort-merge and hash joins are supported.
+</p><p>
+<a href="./proj1/spaceMgr/heap_file.html"><b>Heap Files</b></a>  All data
+records are stored in heap files, which are files of unordered pages
+implemented on top of the DB class.
+</p><p>
+<!--<a href="./proj2/AM/am.html">--><b>Access Methods:</b></a> Currently only
+a single access method is supported, <!--<a href="BTree.html">-->
+<b>B+ Trees</b></a>.
+The access method in Minibase is dense, unclustered, and
+store key/rid-of-data-record pairs (Alternative 2, in terms of the text).
+Data records are always stored in heap files, as noted above,
+and access methods are implemented (like heap files) as 
+files on top of the DB class.
+</p><p>
+<a href="./proj1/bufMgr/bufMgr.html"><b>Buffer Manager:</b></a> 
+The buffer manager swaps pages in and out of the (main memory) buffer
+pool in response to requests from access method and the heap file
+component.
+</p><p>
+<a href="./proj1/spaceMgr/dsm.html"><b>Disk Space Manager:</b></a> 
+A database is a fixed size Unix file, and pages (in the file) on
+disk are managed by the disk space manager.  
+</p><p>
+
+<p align="left"><img border="0" src="hline.gif" align="center" width="1024" height="2"></p>
+<br>
+
+</p><p>
+
+<!--<a href="overview3.html">
+<b>Next Page of Overview</b></a>  
+</p><p>-->
+
+<a href="index.html">Click here to go the Minibase Home Page</a>
+
+
+</p><p>
+
+&nbsp;<!--msnavigation--></p></td></tr><!--msnavigation--></tbody></table>
+
+
+
+
+
+</body></html>

@@ -1,0 +1,79 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>B+ Tree</title>
+<meta name="Microsoft Border" content="t, default">
+</head>
+<body bgcolor="#FFFFFF" text="#440000" li="" nk="#339966" vlink="#CC0000" alink="#0000CC">
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td>
+				<p align="center">&nbsp;</p>
+				<table border="0" width="100%">
+				  <tbody>
+					<tr>
+					    <td width="88%">
+						<p align="left"><img border="0" src="../../uadcs.gif" align="center"></p>
+						<h1 align="center"><font size="6"><strong>Spring 2017</strong></font></h1>
+						<h1 align="center"><font size="6"><strong>CSc 560: Database Systems Implementation</strong></font></h1>
+						<p align="center"><font size="4">Instructor: <a href="http://www.cs.arizona.edu/~rts" target="_blank">Richard T. Snodgrass</a></font></p>
+						<hr>
+						</td>
+					</tr>
+				  </tbody>
+				</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<h1>B+ Trees</h1>
+
+<hr>
+<p>
+</p><h2> Introduction </h2>
+<p>
+B+ Trees are one of the <a href="../AM/am.html">access methods</a> that
+are available in Minibase.  
+For a detailed discussion of B+ Trees and the search, insert and delete
+algorithms, see the <b>text</b></a>.
+</p>
+
+<hr>
+
+</p><h2>Design Decisions</h2>
+A few assumptions are made with respect to inserts and deletes in
+B+ Trees. <p>
+
+On inserts,when a page becomes full it is split in such a way as to keep
+the resulting pages about half full, subject to the condition
+that all duplicates remain on the same page.  (Two key/rid pairs
+are `duplicates' if they have the same key value.)  In Minibase,
+we assume that there will never be more than a page full of
+index entries with the same key value.
+</p><p>
+Index entries are deleted without any attempt to merge pages
+that become less than half-full.  
+Pages are de-allocated when they become empty.
+(Thus, only a simplified form of the B+ tree deletion algorithm
+is implemented.)
+
+</p><p>
+The <b>BTreeFile</b> class is derived from <b>IndexFile</b>,
+and scans are objects of the <b>BTreeFileScan</b> class.
+Pages are <b>BTreePage</b> objects.  Lower levels (e.g. the Disk
+Space Manager) treat pages as <b>Page</b> objects; casting
+is used to obtain <b>BTreePage</b> objects. 
+</p>
+
+<hr>
+<p>
+Click here for the <a href="./btfile.h"><b>public interface</b></a>.
+</p>
+
+<hr>
+<p>
+<a href="https://www2.cs.arizona.edu/classes/cs560/spring17/project/project.html">Back to the List of Components</a><br>
+<a href="https://www2.cs.arizona.edu/classes/cs560/spring17/project/miniusage.html">Back to the Minibase Home Page</a><br>
+</p>
+</body></html>

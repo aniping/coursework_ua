@@ -1,0 +1,102 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX template for reading report
+% Author: Shuo Yang
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,epsfig,graphics,hyperref,amsthm,mathtools,enumitem}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{colorlinks=true}
+
+\setlength{\textwidth}{7in}
+\setlength{\topmargin}{-0.575in}
+\setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\evensidemargin}{-.25in}
+
+\reversemarginpar
+\setlength{\marginparsep}{-15mm}
+
+\newcommand{\rmv}[1]{}
+\newcommand{\bemph}[1]{{\bfseries\itshape#1}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\imply}{\to}
+\newcommand{\bic}{\leftrightarrow}
+
+% Some user defined strings for the homework assignment
+%
+\def\CourseCode{CS525}
+\def\ReportNo{15}
+\def\Category{Reading Report}
+\def\PaperTitle{Networking Named Content}
+\def\Author{Shuo Yang}
+
+\begin{document}
+
+\noindent
+
+\CourseCode \hfill \Category
+
+\begin{center}
+Reading Report \#\ReportNo\\
+Paper: \PaperTitle\\
+Student: \Author\\
+\end{center}
+
+% A horizontal split line
+\hrule\smallskip
+\vspace{1.5em}
+The paper proposed an fundamentally different approach to the Internet
+design than the current Internet architecture. It intended to shift
+from the current IP-centric networking to a future content-centric
+networking where it views data, but not hosts, as the network
+primitive. Such a radically different idea is very interesting and
+intriguing, but I want to raise some concerns to this named-content
+networking approach.
+
+\begin{enumerate}
+\item \emph{Performance concern}\\ Named content networking uses a PKI
+  (public key infrastructure) 
+  to bind a name to a public key. Every content object needs to be
+  signed for privacy concern. For the current Internet, we already have a large amount of
+  web servers who sign data or use SSL for privacy reasons. And this
+  is just for end-to-end connectivity. If we shift the architecture to
+  named content where each content object is unique, it will cause
+  even more security signature. How do we 
+  manage public key globally? Does every content object need to be
+  signed? Should each router forwarding a content object verify its integrity?
+  These questions are critically for named content networking
+  in terms of performance. Implementing security at the content level is good
+  for privacy but can impact performance negatively.
+\item \emph{Inter-domain routing}\\
+  The paper did not say much about inter-domain routing within the named
+  content networking. It illustrated the problem of bottom-up
+  deployment and proposed to use the current BGP inter-domain
+  routing. But we know that BGP is problematic by its own and
+  using an old inter-domain routing for a completely new Internet
+  architecture does not sound that convincing.
+\item \emph{Applications}\\
+  The current Internet is sender driven, which means communications
+  are centralized around content providers. So even though many users
+  are interested in the same piece of content (for example, a popular
+  Youtube video) and they do not care where they get it, each of them
+  still has to establish a connection with Youtube server to get that
+  content. Such observation and the fact that current Internet is more
+  and more content-centric are the underlying motivation of the named
+  content networking, trying to turn the Internet into a
+  receiver-driven network. However, Internet is rich of a variety of
+  applications, still there are many applications favor sender driven
+  model. For example, email service and instance messaging. Such
+  applications still emphasize host to host connectivity, which the
+  current TCP/IP seems to better fit them than the named content
+  networking. So how to enable the named content networking to satisfy
+  the needs of different network applications (not only for content
+  delivery) remains a challenging.
+\end{enumerate}
+
+\vspace{1em}
+
+\end{document}
